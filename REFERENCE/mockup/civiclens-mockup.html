@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CivicLens — Mockup v1 (India-first)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@500;600&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  /* ============ Tokens ============ */
+  :root{
+    --paper:#F3EFE6; --paper-2:#E9E3D5; --card:#FFFFFF;
+    --ink:#15211B; --ink-2:#47544D; --ink-3:#77827C; --line:#DFD9CB; --line-2:#ECE7DC;
+    --g9:#0C3A2B; --g8:#11503B; --g7:#16624A; --g5:#1E8A5E; --g2:#CFE6D8; --g1:#E6F2EA;
+    --amber:#8A5A00; --amber-bg:#FFF0D2;
+    --blue:#1F4F99;  --blue-bg:#E3EBF8;
+    --violet:#5B3E96; --violet-bg:#ECE6F7;
+    --red:#A3241C;   --red-bg:#FBE4E0;
+    --r-lg:18px; --r-md:12px; --r-sm:8px;
+    --display:"Fraunces", Georgia, serif;
+    --ui:"Public Sans", "Segoe UI", system-ui, sans-serif;
+    --mono:"IBM Plex Mono", ui-monospace, Consolas, monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    font-family:var(--ui); color:var(--ink); background:var(--paper);
+    background-image:
+      linear-gradient(rgba(22,98,74,.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(22,98,74,.06) 1px, transparent 1px),
+      linear-gradient(rgba(22,98,74,.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(22,98,74,.035) 1px, transparent 1px);
+    background-size:120px 120px,120px 120px,24px 24px,24px 24px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .sr{position:absolute;width:0;height:0;overflow:hidden}
+
+  /* ============ Page chrome ============ */
+  .page{max-width:1400px;margin:0 auto;padding:56px 40px 80px}
+  .masthead{display:grid;grid-template-columns:1fr auto;gap:24px;align-items:end;border-bottom:2px solid var(--ink);padding-bottom:22px}
+  .masthead .kicker{font:600 12px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--g7)}
+  .masthead h1{font:700 64px/0.95 var(--display);letter-spacing:-.02em;margin:10px 0 8px}
+  .masthead h1 em{font-style:normal;color:var(--g7)}
+  .masthead p{margin:0;color:var(--ink-2);font-size:16px;max-width:620px}
+  .meta{text-align:right;font:500 12px/1.7 var(--mono);color:var(--ink-2)}
+  .meta b{color:var(--ink)}
+  .legend{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;margin-top:10px}
+
+  .section{margin-top:56px}
+  .section-head{display:flex;align-items:baseline;gap:14px;margin-bottom:26px}
+  .marker{font:600 12px/1 var(--mono);background:var(--ink);color:var(--paper);padding:7px 9px;border-radius:4px;letter-spacing:.08em}
+  .section-head h2{font:600 30px/1.1 var(--display);margin:0;letter-spacing:-.01em}
+  .section-head span{color:var(--ink-3);font-size:14px}
+
+  .rail{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:40px 28px;justify-items:center}
+  .frame{width:300px;animation:rise .6s cubic-bezier(.2,.7,.2,1) both}
+  .rail .frame:nth-child(2){animation-delay:.05s}.rail .frame:nth-child(3){animation-delay:.1s}
+  .rail .frame:nth-child(4){animation-delay:.15s}.rail .frame:nth-child(5){animation-delay:.2s}
+  .rail .frame:nth-child(6){animation-delay:.25s}.rail .frame:nth-child(7){animation-delay:.3s}
+  .rail .frame:nth-child(8){animation-delay:.35s}
+  @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  .cap{margin-top:14px;padding-left:4px}
+  .cap h3{margin:0;font:600 15px/1.3 var(--ui)}
+  .cap h3 i{font-style:normal;font-family:var(--mono);color:var(--g7);margin-right:6px}
+  .cap p{margin:4px 0 0;color:var(--ink-3);font-size:13px;line-height:1.45}
+
+  /* ============ Phone ============ */
+  .phone{width:300px;height:636px;background:var(--card);border-radius:40px;border:9px solid #111814;
+    box-shadow:0 1px 0 #2c3a33 inset,0 30px 50px -22px rgba(12,58,43,.45),0 8px 18px -10px rgba(0,0,0,.25);
+    overflow:hidden;position:relative;display:flex;flex-direction:column}
+  .sbar{height:34px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:0 22px;font:600 12px var(--ui)}
+  .sbar.dark{color:#fff;background:var(--g9)}
+  .sbar .ic{display:flex;gap:5px;align-items:center}
+  .sbar .ic i{display:block;width:16px;height:9px;border:1.5px solid currentColor;border-radius:3px;position:relative}
+  .sbar .ic i::after{content:"";position:absolute;inset:1.5px 4px 1.5px 1.5px;background:currentColor;border-radius:1px}
+  .sbar .ic s{display:block;width:13px;height:9px;background:linear-gradient(90deg,currentColor 0 2px,transparent 2px 4px,currentColor 4px 6px,transparent 6px 8px,currentColor 8px 10px,transparent 10px 11px,currentColor 11px 13px);clip-path:polygon(0 100%,100% 0,100% 100%)}
+  .scr{flex:1;padding:4px 18px 18px;display:flex;flex-direction:column;overflow:hidden;position:relative}
+  .scr.with-tabs{padding-bottom:78px}
+
+  .topbar{display:flex;align-items:center;gap:10px;height:40px;margin-bottom:6px}
+  .topbar .back{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--line);color:var(--ink)}
+  .topbar h4{margin:0;font:600 15px var(--ui)}
+  .topbar .sp{flex:1}
+
+  svg.i{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  svg.i.s{width:14px;height:14px}
+  svg.i.l{width:22px;height:22px}
+
+  /* type */
+  .h-display{font:600 24px/1.15 var(--display);letter-spacing:-.01em;margin:0}
+  .muted{color:var(--ink-3)}
+  .small{font-size:12px}
+  .mono{font-family:var(--mono)}
+
+  /* form */
+  .field{margin-top:12px}
+  .field label{display:block;font:600 11.5px var(--ui);color:var(--ink-2);margin-bottom:5px}
+  .field label small{font-weight:400;color:var(--ink-3)}
+  .input{height:40px;border:1.5px solid var(--line);border-radius:var(--r-sm);display:flex;align-items:center;padding:0 12px;gap:8px;font-size:13.5px;background:#fff;color:var(--ink)}
+  .input.ph{color:var(--ink-3)}
+  .input .pre{color:var(--ink-2);font-weight:600;padding-right:8px;border-right:1px solid var(--line)}
+  .input .end{margin-left:auto;color:var(--ink-3)}
+  .input.focus{border-color:var(--g7);box-shadow:0 0 0 3px var(--g1)}
+  .input.disabled{background:var(--line-2);color:var(--ink-3)}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .btn{height:46px;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;gap:8px;font:600 14.5px var(--ui);border:0}
+  .btn.pri{background:var(--g7);color:#fff;box-shadow:0 1px 0 rgba(255,255,255,.15) inset,0 6px 14px -8px var(--g7)}
+  .btn.out{background:#fff;color:var(--g8);border:1.5px solid var(--g2)}
+  .btn.ghost{color:var(--g7);height:36px}
+  .link{color:var(--g7);font-weight:600}
+  .grow{flex:1}
+  .check{display:flex;gap:8px;align-items:flex-start;font-size:12px;color:var(--ink-2);margin-top:12px;line-height:1.4}
+  .check b{width:18px;height:18px;border-radius:5px;background:var(--g7);color:#fff;display:grid;place-items:center;flex:none}
+
+  /* chips */
+  .chip{display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:999px;font:600 11px var(--ui);white-space:nowrap}
+  .chip::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+  .chip.nodot::before{display:none}
+  .c-sub{background:#EEF0EE;color:#3E4943}
+  .c-asg{background:var(--blue-bg);color:var(--blue)}
+  .c-rev{background:var(--violet-bg);color:var(--violet)}
+  .c-prog{background:var(--amber-bg);color:var(--amber)}
+  .c-res{background:var(--g1);color:var(--g7)}
+  .c-rej,.c-over{background:var(--red-bg);color:var(--red)}
+  .c-demo{background:var(--ink);color:var(--paper)}
+  .c-demo::before{display:none}
+
+  /* stepper */
+  .stepper{display:flex;align-items:center;gap:6px;margin:2px 0 12px}
+  .st{display:flex;align-items:center;gap:6px;font:600 11px var(--ui);color:var(--ink-3)}
+  .st b{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;border:1.5px solid var(--line);font:600 10.5px var(--mono);color:var(--ink-3)}
+  .st.on{color:var(--ink)} .st.on b{background:var(--g7);border-color:var(--g7);color:#fff}
+  .st.done b{background:var(--g1);border-color:var(--g2);color:var(--g7)}
+  .st-line{flex:1;height:1.5px;background:var(--line)}
+  .st-line.on{background:var(--g5)}
+
+  /* cards */
+  .card{background:#fff;border:1px solid var(--line);border-radius:var(--r-md);padding:12px}
+  .card.tint{background:var(--g1);border-color:var(--g2)}
+
+  /* photo */
+  .photo{display:block;width:100%;border-radius:var(--r-md);background:#6f6c66}
+
+  /* tabbar */
+  .tabs{position:absolute;left:0;right:0;bottom:0;height:66px;background:#fff;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);padding:8px 6px 12px}
+  .tab{display:flex;flex-direction:column;align-items:center;gap:3px;font:500 10.5px var(--ui);color:var(--ink-3);position:relative}
+  .tab.on{color:var(--g7);font-weight:700}
+  .tab.on::before{content:"";position:absolute;top:-9px;width:26px;height:3px;border-radius:0 0 3px 3px;background:var(--g7)}
+  .tab .dot{position:absolute;top:0;right:24px;width:7px;height:7px;border-radius:50%;background:var(--red);border:1.5px solid #fff}
+
+  /* timeline */
+  .tl{list-style:none;margin:0;padding:0;position:relative}
+  .tl li{display:grid;grid-template-columns:26px 1fr;gap:10px;padding-bottom:13px;position:relative}
+  .tl li::before{content:"";position:absolute;left:12px;top:24px;bottom:-2px;width:2px;background:var(--g2)}
+  .tl li:last-child::before{display:none}
+  .tl li.pending::before{background:repeating-linear-gradient(var(--line) 0 4px,transparent 4px 8px)}
+  .tl .n{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--g7);color:#fff;z-index:1}
+  .tl .n.now{background:var(--amber);box-shadow:0 0 0 4px var(--amber-bg)}
+  .tl .n.wait{background:#fff;border:2px dashed var(--line);color:var(--ink-3)}
+  .tl h5{margin:2px 0 0;font:600 13px var(--ui);display:flex;align-items:center;gap:6px}
+  .tl time{display:block;font:500 11px var(--mono);color:var(--ink-3);margin-top:2px}
+  .tl p{margin:4px 0 0;font-size:12px;color:var(--ink-2);line-height:1.4}
+  .tl .upd{margin-top:6px;background:var(--amber-bg);border-left:3px solid var(--amber);padding:6px 8px;border-radius:0 6px 6px 0;font-size:12px;color:#4a3300}
+
+  .live{display:inline-flex;align-items:center;gap:6px;font:600 11px var(--mono);color:var(--g7);text-transform:uppercase;letter-spacing:.06em}
+  .live::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--g5);animation:pulse 1.8s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(30,138,94,.55)}70%{box-shadow:0 0 0 8px rgba(30,138,94,0)}100%{box-shadow:0 0 0 0 rgba(30,138,94,0)}}
+
+  /* ============ Screen-specific ============ */
+  /* Welcome */
+  .hero{background:var(--g9);color:#fff;margin:-38px -18px 0;padding:46px 22px 96px;position:relative;overflow:hidden}
+  .hero .skyline{position:absolute;left:0;right:0;bottom:0;width:100%;height:82px}
+  .brand{display:flex;align-items:center;gap:10px}
+  .brand .mark{width:40px;height:40px;border-radius:12px;background:var(--g5);display:grid;place-items:center}
+  .brand b{font:700 26px var(--display);letter-spacing:-.01em}
+  .hero p{margin:14px 0 0;font:500 17px/1.35 var(--display);max-width:220px;color:#E3F1E9;position:relative}
+  .sheet{background:#fff;border-radius:22px 22px 0 0;margin:-28px -18px 0;padding:20px 18px 0;position:relative;flex:1;display:flex;flex-direction:column}
+  .sheet h3{margin:0;font:600 18px var(--ui)}
+  .foot-note{margin-top:auto;font:500 10px var(--mono);color:var(--ink-3);text-align:center;letter-spacing:.02em;padding-top:10px}
+
+  /* Signup location fieldset */
+  .loc{margin-top:14px;border:1.5px dashed var(--g2);background:linear-gradient(var(--g1),#fff 70%);border-radius:var(--r-md);padding:10px 10px 12px}
+  .loc legend,.loc .lg{font:600 11.5px var(--ui);color:var(--g8);display:flex;align-items:center;gap:6px}
+  .casc{display:grid;gap:6px;margin-top:8px}
+  .casc .input{height:36px;font-size:13px}
+  .casc .step{font:600 9.5px var(--mono);color:var(--g7);background:#fff;border:1px solid var(--g2);border-radius:4px;padding:2px 4px}
+
+  /* Verify */
+  .center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 6px}
+  .badge-ic{width:84px;height:84px;border-radius:26px;background:var(--g1);color:var(--g7);display:grid;place-items:center;border:1.5px solid var(--g2);margin-bottom:18px;transform:rotate(-4deg)}
+  .badge-ic svg{width:38px;height:38px}
+
+  /* Home */
+  .homehead{background:var(--g9);color:#fff;margin:-38px -18px 0;padding:42px 18px 52px}
+  .homehead .hi{font:500 13px var(--ui);color:#B7D7C5}
+  .homehead .name{font:600 26px/1.1 var(--display)}
+  .citychip{display:inline-flex;gap:5px;align-items:center;margin-top:10px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);height:26px;padding:0 10px;border-radius:999px;font:600 11.5px var(--ui)}
+  .bell{position:absolute;right:18px;top:46px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.1);display:grid;place-items:center;color:#fff}
+  .bell::after{content:"";position:absolute;top:8px;right:9px;width:7px;height:7px;border-radius:50%;background:#F2B544}
+  .report{margin-top:-40px;background:#fff;border-radius:var(--r-lg);padding:14px;box-shadow:0 14px 26px -18px rgba(12,58,43,.6);border:1px solid var(--line);position:relative}
+  .report h5{margin:0;font:600 15px var(--ui)}
+  .report p{margin:3px 0 12px;font-size:12px;color:var(--ink-3)}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+  .stat{border:1px solid var(--line);border-radius:var(--r-sm);padding:6px 10px;background:#fff;display:flex;align-items:baseline;gap:6px}
+  .stat b{display:block;font:600 18px/1 var(--display)}
+  .stat span{font-size:10.5px;color:var(--ink-3);font-weight:600;white-space:nowrap}
+  .grid6{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px}
+  .gtile{border:1px solid var(--line);border-radius:var(--r-md);padding:7px 4px 6px;text-align:center;font:600 10px/1.2 var(--ui);color:var(--ink-2);background:#fff}
+  .gtile .gi{width:28px;height:28px;margin:0 auto 4px;border-radius:9px;display:grid;place-items:center}
+  .t-road .gi{background:#ECEAE4;color:#4B4A44}.t-water .gi{background:#E1EEF6;color:#1C5F86}
+  .t-power .gi{background:#FFF1CF;color:#8A5A00}.t-clean .gi{background:var(--g1);color:var(--g7)}
+  .t-tree .gi{background:#E8F1DC;color:#3F6B1F}.t-other .gi{background:#EFECF4;color:#5B3E96}
+  .sect-t{display:flex;justify-content:space-between;align-items:baseline;margin-top:14px;font:600 12.5px var(--ui)}
+  .sect-t a{font-size:11.5px;color:var(--g7)}
+
+  /* Capture */
+  .vf{position:relative;border-radius:var(--r-lg);overflow:hidden;background:#000}
+  .vf .photo{border-radius:0;height:250px}
+  .vf .corner{position:absolute;width:26px;height:26px;border:3px solid #fff;opacity:.9}
+  .vf .tl1{top:14px;left:14px;border-right:0;border-bottom:0;border-radius:8px 0 0 0}
+  .vf .tr1{top:14px;right:14px;border-left:0;border-bottom:0;border-radius:0 8px 0 0}
+  .vf .bl1{bottom:14px;left:14px;border-right:0;border-top:0;border-radius:0 0 0 8px}
+  .vf .br1{bottom:14px;right:14px;border-left:0;border-top:0;border-radius:0 0 8px 0}
+  .vf .retake{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);background:rgba(17,24,20,.78);color:#fff;height:30px;padding:0 12px;border-radius:999px;display:flex;align-items:center;gap:6px;font:600 12px var(--ui)}
+  .vf .tag{position:absolute;top:14px;left:50%;transform:translateX(-50%);white-space:nowrap;background:rgba(255,255,255,.92);font:600 10.5px var(--mono);padding:4px 8px;border-radius:6px;color:var(--g8)}
+  .gps{display:grid;grid-template-columns:64px 1fr;gap:10px;margin-top:12px;padding:8px;align-items:center}
+  .gps .map{width:64px;height:64px;border-radius:10px;overflow:hidden;position:relative}
+  .gps .map svg{width:100%;height:100%}
+  .gps h6{margin:0;font:600 13px var(--ui);display:flex;align-items:center;gap:6px;color:var(--g8)}
+  .gps .co{font:600 12.5px/1.3 var(--ui);color:var(--ink);margin-top:4px}
+  .gps .co small{display:block;font-weight:500;font-size:11px;color:var(--ink-2);margin-top:1px}
+  .gps .acc{font-size:11px;color:var(--ink-3);margin-top:2px}
+  .hint{display:flex;gap:6px;align-items:flex-start;font-size:11px;color:var(--ink-3);margin-top:10px;line-height:1.4}
+
+  /* Describe */
+  .mini{display:flex;gap:10px;align-items:center}
+  .mini svg.photo{width:56px;height:56px;border-radius:10px;flex:none}
+  .ok{display:inline-flex;align-items:center;gap:4px;font:600 11px var(--ui);color:var(--g7)}
+  .ta{border:1.5px solid var(--g7);box-shadow:0 0 0 3px var(--g1);border-radius:var(--r-sm);padding:10px 12px;font-size:13px;line-height:1.45;min-height:70px;position:relative}
+  .ta .cnt{position:absolute;right:10px;bottom:6px;font:500 10.5px var(--mono);color:var(--ink-3)}
+  .ai{margin-top:12px;border:1.5px solid var(--g2);border-radius:var(--r-md);overflow:hidden;background:#fff}
+  .ai-h{display:flex;align-items:center;gap:6px;padding:8px 10px;background:var(--g1);font:600 12px var(--ui);color:var(--g8)}
+  .ai-h .chip{margin-left:auto;background:#fff;color:var(--amber)}
+  .ai-b{padding:6px 10px 10px}
+  .kv{display:grid;grid-template-columns:78px 1fr;gap:4px;font-size:12px;padding:5px 0;border-bottom:1px dashed var(--line-2)}
+  .kv:last-of-type{border-bottom:0}
+  .kv dt{color:var(--ink-3);font-weight:500}
+  .kv dd{margin:0;font-weight:600}
+  .kv dd small{display:block;font-weight:500;color:var(--ink-3);font-size:10.5px}
+  .conf{display:flex;align-items:center;gap:8px;margin-top:6px;font:500 11px var(--mono);color:var(--ink-2)}
+  .conf i{flex:1;height:6px;border-radius:3px;background:var(--line-2);position:relative;overflow:hidden}
+  .conf i::after{content:"";position:absolute;inset:0 18% 0 0;background:var(--g5);border-radius:3px}
+  .obs{margin:6px 0 0;padding-left:16px;font-size:11.5px;color:var(--ink-2);line-height:1.5}
+
+  /* Review */
+  .strip{display:grid;grid-template-columns:1fr;gap:6px}
+  .strip svg.photo{height:96px}
+  .rv{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line-2);font-size:12.5px}
+  .rv .k{color:var(--ink-3);font-size:11px;font-weight:600;display:block;margin-bottom:2px}
+  .rv .v{font-weight:600}
+  .rv .ed{color:var(--g7);font:600 11.5px var(--ui)}
+  .seg{display:grid;grid-template-columns:repeat(4,1fr);border:1.5px solid var(--line);border-radius:var(--r-sm);overflow:hidden;margin-top:4px}
+  .seg span{text-align:center;font:600 11px var(--ui);padding:6px 0;color:var(--ink-2);border-right:1px solid var(--line)}
+  .seg span:last-child{border-right:0}
+  .seg .on{background:#FCE9C7;color:#6D4700;box-shadow:inset 0 -2px 0 var(--amber)}
+  .dest{margin-top:10px;display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:center}
+  .dest .di{width:34px;height:34px;border-radius:10px;background:var(--g7);color:#fff;display:grid;place-items:center}
+  .dest b{display:block;font-size:12.5px}
+  .dest span{font-size:11px;color:var(--g8)}
+  .sla{display:flex;align-items:center;gap:6px;margin-top:8px;font:600 11px var(--ui);color:var(--ink-2)}
+
+  /* Ticket */
+  .ok-ic{width:62px;height:62px;border-radius:50%;background:var(--g7);color:#fff;display:grid;place-items:center;margin:6px auto 10px;box-shadow:0 0 0 8px var(--g1)}
+  .ok-ic svg{width:30px;height:30px;stroke-width:2.4}
+  .ticket{margin-top:16px;background:#fff;border:1.5px solid var(--line);border-radius:14px;position:relative}
+  .ticket .top{padding:14px 14px 12px;text-align:center}
+  .ticket .ref{font:600 22px/1 var(--mono);letter-spacing:.02em;color:var(--g9);margin-top:6px}
+  .ticket .perf{height:0;border-top:2px dashed var(--line);margin:0 12px;position:relative}
+  .ticket .perf::before,.ticket .perf::after{content:"";position:absolute;top:-10px;width:18px;height:18px;border-radius:50%;background:#fff;border:1.5px solid var(--line)}
+  .ticket .perf::before{left:-22px;clip-path:inset(0 0 0 50%)}
+  .ticket .perf::after{right:-22px;clip-path:inset(0 50% 0 0)}
+  .ticket .bot{padding:10px 14px 12px;display:grid;grid-template-columns:1fr 1fr;gap:8px 10px}
+  .ticket .bot div{font-size:11.5px;font-weight:600}
+  .ticket .bot div span{display:block;font-size:10px;color:var(--ink-3);font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
+  .stamp{position:absolute;right:12px;bottom:12px;transform:rotate(-8deg);background:#fff;border:2px solid var(--g5);color:var(--g5);font:700 9px var(--mono);letter-spacing:.12em;padding:3px 5px;border-radius:4px;opacity:.8}
+
+  /* List */
+  .search{height:38px;border:1.5px solid var(--line);border-radius:var(--r-sm);display:flex;align-items:center;gap:8px;padding:0 10px;font-size:12.5px;color:var(--ink-3)}
+  .filters{display:flex;gap:6px;margin:10px 0 4px;overflow:hidden}
+  .f{height:28px;padding:0 11px;border-radius:999px;border:1.5px solid var(--line);font:600 11.5px var(--ui);display:flex;align-items:center;color:var(--ink-2);white-space:nowrap}
+  .f.on{background:var(--ink);border-color:var(--ink);color:#fff}
+  .item{display:grid;grid-template-columns:54px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid var(--line-2)}
+  .item svg.photo{width:54px;height:54px;border-radius:10px}
+  .item .ref{font:600 10.5px var(--mono);color:var(--ink-3)}
+  .item h6{margin:2px 0 3px;font:600 13px/1.25 var(--ui)}
+  .item .sub{font-size:11px;color:var(--ink-3);display:flex;justify-content:space-between;align-items:center;gap:6px;margin-top:4px}
+
+  /* Details */
+  .dhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+  .dmeta{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:10px 0 12px}
+  .dmeta div{background:var(--paper);border-radius:8px;padding:6px 8px;font-size:11.5px;font-weight:600}
+  .dmeta div span{display:block;font-size:9.5px;font-weight:600;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em}
+
+  /* Resolved */
+  .resolved-banner{background:var(--g9);color:#fff;margin:0 -18px;padding:18px 18px 22px;text-align:center;position:relative;overflow:hidden}
+  .resolved-banner::after{content:"";position:absolute;inset:auto -40px -60px auto;width:160px;height:160px;border-radius:50%;border:24px solid rgba(255,255,255,.06)}
+  .resolved-banner .ok-ic{background:#fff;color:var(--g7);box-shadow:0 0 0 8px rgba(255,255,255,.12)}
+  .resolved-banner h3{margin:0;font:600 22px var(--display)}
+  .resolved-banner p{margin:4px 0 0;font-size:12px;color:#B7D7C5}
+  .note{border-left:3px solid var(--g5);background:var(--g1);padding:10px 12px;border-radius:0 10px 10px 0;font-size:12.5px;line-height:1.45}
+  .note cite{display:block;font-style:normal;font-size:11px;color:var(--g8);margin-top:6px;font-weight:600}
+  .within{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:11.5px;font-weight:600;color:var(--g8)}
+
+  /* ============ Browser / Dashboard ============ */
+  .browser{max-width:1320px;margin:0 auto;border-radius:14px;overflow:hidden;background:#fff;border:1px solid #cfc8b8;
+    box-shadow:0 40px 70px -40px rgba(12,58,43,.55),0 10px 24px -14px rgba(0,0,0,.2);animation:rise .7s .2s both}
+  .chrome{height:40px;background:#EDE8DD;display:flex;align-items:center;gap:14px;padding:0 14px;border-bottom:1px solid #D9D2C3}
+  .dots{display:flex;gap:6px}.dots i{width:11px;height:11px;border-radius:50%;background:#D2CBBB}
+  .url{flex:1;max-width:520px;height:26px;border-radius:7px;background:#fff;border:1px solid #DAD3C4;display:flex;align-items:center;gap:6px;padding:0 10px;font:500 12px var(--mono);color:var(--ink-2)}
+  .app{display:grid;grid-template-columns:224px 1fr;min-height:860px}
+  .side{background:var(--g9);color:#CFE3D7;padding:18px 14px;display:flex;flex-direction:column;gap:2px}
+  .side .brand{margin:0 6px 20px}
+  .side .brand .mark{width:32px;height:32px;border-radius:9px}
+  .side .brand b{font-size:20px;color:#fff}
+  .nav{display:flex;align-items:center;gap:10px;height:38px;padding:0 10px;border-radius:9px;font:500 13.5px var(--ui)}
+  .nav.on{background:rgba(255,255,255,.1);color:#fff;font-weight:600;box-shadow:inset 3px 0 0 #7FD1A8}
+  .nav .cnt{margin-left:auto;font:600 10.5px var(--mono);background:rgba(255,255,255,.12);padding:2px 6px;border-radius:5px}
+  .side .grp{font:600 10px var(--mono);letter-spacing:.14em;color:#7FA393;margin:16px 10px 6px}
+  .side .who{margin-top:auto;display:flex;gap:10px;align-items:center;padding:10px;border-top:1px solid rgba(255,255,255,.1)}
+  .av{width:32px;height:32px;border-radius:50%;background:#7FD1A8;color:var(--g9);display:grid;place-items:center;font:700 12px var(--ui)}
+  .who b{display:block;color:#fff;font-size:12.5px}.who span{font-size:11px}
+
+  .main{background:#FAF8F3;padding:22px 26px 28px}
+  .mtop{display:flex;align-items:flex-end;gap:14px;margin-bottom:18px}
+  .mtop h2{margin:0;font:600 28px/1.1 var(--display);letter-spacing:-.01em}
+  .mtop p{margin:4px 0 0;color:var(--ink-3);font-size:13px}
+  .sel{height:36px;border:1.5px solid var(--line);border-radius:9px;background:#fff;display:flex;align-items:center;gap:8px;padding:0 12px;font:600 13px var(--ui)}
+  .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
+  .kpi{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;position:relative;overflow:hidden}
+  .kpi span{font:600 11.5px var(--ui);color:var(--ink-3)}
+  .kpi b{display:block;font:600 30px/1.1 var(--display);margin-top:6px}
+  .kpi small{font:500 11px var(--mono);color:var(--ink-3)}
+  .kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--line)}
+  .kpi.k-new::before{background:#8C968F}.kpi.k-rev::before{background:var(--violet)}.kpi.k-prog::before{background:#C98A10}
+  .kpi.k-res::before{background:var(--g5)}.kpi.k-over{background:var(--red-bg);border-color:#F1C2BC}.kpi.k-over::before{background:var(--red)}
+  .kpi.k-over b,.kpi.k-over span{color:var(--red)}
+  .two{display:grid;grid-template-columns:1.25fr 1fr;gap:14px;margin-top:14px}
+  .panel{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .panel h4{margin:0 0 12px;font:600 14px var(--ui);display:flex;align-items:center;justify-content:space-between}
+  .panel h4 small{font:500 11px var(--mono);color:var(--ink-3)}
+  .bar{display:grid;grid-template-columns:170px 1fr 70px;gap:10px;align-items:center;font-size:12.5px;padding:5px 0}
+  .bar i{display:block;height:10px;border-radius:5px;background:var(--line-2);position:relative;overflow:hidden}
+  .bar i::after{content:"";position:absolute;inset:0;width:var(--w);background:var(--g7);border-radius:5px}
+  .bar em{font:500 11.5px var(--mono);font-style:normal;color:var(--ink-2);text-align:right}
+  .bar em b{color:var(--red);font-weight:600}
+  .cats{display:grid;gap:8px}
+  .catrow{display:grid;grid-template-columns:28px 1fr auto;gap:10px;align-items:center;font-size:12.5px}
+  .catrow .gi{width:28px;height:28px;border-radius:8px;display:grid;place-items:center}
+  .catrow small{display:block;color:var(--ink-3);font-size:11px}
+  .catrow b{font:600 13px var(--mono)}
+
+  .work{display:grid;grid-template-columns:1fr 360px;gap:14px;margin-top:14px}
+  .tfil{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+  .tfil .search{height:34px;width:260px;background:#fff}
+  .tfil .sel{height:34px;font-size:12.5px;font-weight:500}
+  .tog{display:flex;align-items:center;gap:7px;font:600 12px var(--ui);color:var(--red);margin-left:auto}
+  .tog i{width:30px;height:17px;border-radius:9px;background:var(--red);position:relative}
+  .tog i::after{content:"";position:absolute;right:2px;top:2px;width:13px;height:13px;border-radius:50%;background:#fff}
+  table{width:100%;border-collapse:collapse;font-size:12.5px}
+  th{text-align:left;font:600 10.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);padding:8px 8px;border-bottom:1.5px solid var(--line)}
+  td{padding:9px 8px;border-bottom:1px solid var(--line-2);vertical-align:middle}
+  tr.sel-row td{background:var(--g1)}
+  tr.sel-row td:first-child{box-shadow:inset 3px 0 0 var(--g7)}
+  td .ref{font:600 11.5px var(--mono)}
+  td .t{font-weight:600}
+  td .t small{display:block;font-weight:400;color:var(--ink-3);font-size:11px}
+  .sev{font:600 11px var(--ui);display:inline-flex;align-items:center;gap:5px}
+  .sev i{width:8px;height:8px;border-radius:2px;transform:rotate(45deg)}
+  .s-crit i{background:var(--red)}.s-crit{color:var(--red)}
+  .s-high i{background:#C98A10}.s-med i{background:#7C8C84}.s-low i{background:#C3CBC6}
+  .due{font:500 11.5px var(--mono);color:var(--ink-2)}
+  .due.late{color:var(--red);font-weight:600}
+
+  .mg{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;align-self:start}
+  .mg-h{padding:12px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
+  .mg-h .ref{font:600 14px var(--mono)}
+  .mg-b{padding:12px 14px;display:grid;gap:12px}
+  .mg svg.photo{height:120px;border-radius:10px}
+  .cmp{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .cmp div{border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-size:12px;font-weight:600}
+  .cmp div span{display:block;font:600 9.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-bottom:3px}
+  .cmp .ai-s{border-style:dashed;background:#FBFAF6}
+  .lbl{font:600 11.5px var(--ui);color:var(--ink-2);margin-bottom:5px;display:flex;align-items:center;gap:6px}
+  .lbl .chip{margin-left:auto}
+  .tx{border:1.5px solid var(--line);border-radius:8px;padding:8px 10px;font-size:12.5px;line-height:1.45;min-height:54px;color:var(--ink)}
+  .tx.pub{border-color:var(--g2);background:#FAFDFB}
+  .tx.int{border-color:#E9D9B2;background:repeating-linear-gradient(-45deg,#FFFBF1 0 8px,#FFF7E6 8px 16px)}
+  .flow{display:flex;gap:4px;align-items:center;font:600 10.5px var(--ui);flex-wrap:wrap}
+  .flow span{padding:4px 7px;border-radius:6px;background:var(--line-2);color:var(--ink-3)}
+  .flow span.d{background:var(--g1);color:var(--g7)}
+  .flow span.c{background:var(--amber-bg);color:var(--amber);outline:1.5px solid #E8C67E}
+  .flow span.n{background:#fff;color:var(--g8);outline:1.5px dashed var(--g5)}
+  .mg-f{display:flex;gap:8px;padding:12px 14px;border-top:1px solid var(--line);background:#FAF8F3}
+  .mg-f .btn{height:38px;font-size:13px;flex:1}
+  .audit{font:500 10.5px var(--mono);color:var(--ink-3);display:flex;align-items:center;gap:6px}
+
+  .notes{margin-top:56px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .notes div{border-top:2px solid var(--ink);padding-top:12px;font-size:13px;color:var(--ink-2);line-height:1.5}
+  .notes b{display:block;font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink);margin-bottom:6px}
+
+  @media (prefers-reduced-motion: reduce){*{animation:none!important}}
+  @media (max-width:900px){.masthead{grid-template-columns:1fr}.meta{text-align:left}.legend{justify-content:flex-start}.browser{overflow-x:auto}.app{min-width:1180px}.notes{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- ============ SVG sprite (icons + illustrated photos) ============ -->
+<svg class="sr" aria-hidden="true" width="0" height="0">
+  <defs>
+    <filter id="grain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="2" seed="7" />
+      <feColorMatrix values="0 0 0 0 0.22  0 0 0 0 0.22  0 0 0 0 0.2  0 0 0 0.6 0" />
+    </filter>
+    <radialGradient id="holeG" cx="50%" cy="45%" r="60%">
+      <stop offset="0" stop-color="#1d1b18" /><stop offset=".7" stop-color="#2e2b26" /><stop offset="1" stop-color="#55514a" />
+    </radialGradient>
+    <linearGradient id="nightG" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0f1b2d" /><stop offset="1" stop-color="#26324a" />
+    </linearGradient>
+    <linearGradient id="waterG" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5d6b5c" /><stop offset="1" stop-color="#3c4a3f" />
+    </linearGradient>
+  </defs>
+
+  <!-- icons -->
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.6"/></symbol>
+  <symbol id="i-cam" viewBox="0 0 24 24"><path d="M4 8h3l1.6-2.5h6.8L17 8h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.6"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3.5 10.5 12 4l8.5 6.5V20a1 1 0 0 1-1 1H15v-6H9v6H4.5a1 1 0 0 1-1-1z"/></symbol>
+  <symbol id="i-track" viewBox="0 0 24 24"><rect x="4" y="3.5" width="16" height="17" rx="2"/><path d="M8 8.5h8M8 12.5h8M8 16.5h5"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 1.5h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.2 4.2L19 7"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M18.5 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 6.5 12 13l8.5-6.5"/></symbol>
+  <symbol id="i-retake" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4.5h4.5"/></symbol>
+  <symbol id="i-gps" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="7.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22"/></symbol>
+  <symbol id="i-road" viewBox="0 0 24 24"><path d="M8 3 4.5 21M16 3l3.5 18M12 4v3M12 10.5v3M12 17v3"/></symbol>
+  <symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 3.5s6 6.8 6 11a6 6 0 0 1-12 0c0-4.2 6-11 6-11z"/><path d="M9.5 15a2.5 2.5 0 0 0 2.5 2.5"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2.5 4.5 13.5H11l-1 8 8.5-11H12z"/></symbol>
+  <symbol id="i-bin" viewBox="0 0 24 24"><path d="M4 7h16M9.5 7V4.5h5V7M6 7l1 13.5h10L18 7M10 11v6M14 11v6"/></symbol>
+  <symbol id="i-tree" viewBox="0 0 24 24"><path d="M12 21.5V15"/><path d="M12 2.5 18 11h-3.2l4.2 5H5l4.2-5H6z"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="18" cy="12" r="1.4"/><rect x="2.5" y="5" width="19" height="14" rx="4"/></symbol>
+  <symbol id="i-building" viewBox="0 0 24 24"><path d="M3 21h18M5 21V10l7-5 7 5v11M9 21v-5h6v5M8.5 11.5h1M14.5 11.5h1"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></symbol>
+  <symbol id="i-tag" viewBox="0 0 24 24"><path d="M3.5 12.5V4.5a1 1 0 0 1 1-1h8l8 8-9 9z"/><circle cx="8" cy="8" r="1.5"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M21 20H3"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 5.2a3.5 3.5 0 0 1 0 6.6M18 14.5a6.5 6.5 0 0 1 3.5 5.5"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 5 6v6c0 4.5 3 7.8 7 9 4-1.2 7-4.5 7-9V6z"/><path d="M9 12l2.2 2.2L15.5 10"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></symbol>
+
+  <!-- brand mark: map pin with lens -->
+  <symbol id="logo" viewBox="0 0 24 24"><path d="M12 22s-7.5-6.6-7.5-12.2a7.5 7.5 0 0 1 15 0C19.5 15.4 12 22 12 22z" fill="#fff"/><circle cx="12" cy="9.8" r="3.6" fill="none" stroke="#1E8A5E" stroke-width="2.2"/><path d="M14.6 12.4l2 2" stroke="#1E8A5E" stroke-width="2.2" stroke-linecap="round"/></symbol>
+
+  <!-- "photos" -->
+  <symbol id="ph-pothole" viewBox="0 0 300 200" preserveAspectRatio="xMidYMid slice">
+    <rect width="300" height="200" fill="#77736b"/>
+    <rect width="300" height="200" filter="url(#grain)"/>
+    <path d="M-10 170 L310 128" stroke="#E7DFC0" stroke-width="7" stroke-dasharray="46 30" opacity=".75"/>
+    <path d="M0 0 L300 0 L300 40 Q150 70 0 30z" fill="#8e8a80" opacity=".35"/>
+    <ellipse cx="150" cy="104" rx="84" ry="37" fill="#5f5b54"/>
+    <ellipse cx="148" cy="103" rx="72" ry="29" fill="url(#holeG)"/>
+    <ellipse cx="160" cy="110" rx="34" ry="9" fill="#3a3a3e" opacity=".9"/>
+    <ellipse cx="152" cy="108" rx="18" ry="4" fill="#6f7a82" opacity=".5"/>
+    <g fill="#8d887e"><circle cx="66" cy="96" r="4"/><circle cx="79" cy="121" r="3"/><circle cx="231" cy="94" r="5"/><circle cx="222" cy="122" r="3"/><circle cx="96" cy="76" r="2.5"/><circle cx="208" cy="73" r="3"/></g>
+  </symbol>
+  <symbol id="ph-drain" viewBox="0 0 300 200" preserveAspectRatio="xMidYMid slice">
+    <rect width="300" height="200" fill="url(#waterG)"/>
+    <rect width="300" height="200" filter="url(#grain)" opacity=".7"/>
+    <rect x="0" y="120" width="300" height="80" fill="#8c8677"/>
+    <path d="M0 120 h300 v18 H0z" fill="#4a4a3c"/>
+    <path d="M30 128 q40 -14 90 2 t110 -4 t70 4" stroke="#7d8b55" stroke-width="10" fill="none" opacity=".7"/>
+    <ellipse cx="170" cy="70" rx="90" ry="22" fill="#7b8a6d" opacity=".55"/>
+  </symbol>
+  <symbol id="ph-light" viewBox="0 0 300 200" preserveAspectRatio="xMidYMid slice">
+    <rect width="300" height="200" fill="url(#nightG)"/>
+    <rect x="0" y="150" width="300" height="50" fill="#1b2230"/>
+    <path d="M150 155 V40 q0 -12 14 -12 h34" stroke="#59657a" stroke-width="6" fill="none"/>
+    <rect x="192" y="24" width="30" height="10" rx="3" fill="#3d4759"/>
+    <circle cx="60" cy="40" r="1.4" fill="#cfd8ea"/><circle cx="250" cy="60" r="1.2" fill="#cfd8ea"/><circle cx="100" cy="22" r="1" fill="#cfd8ea"/>
+  </symbol>
+  <symbol id="ph-garbage" viewBox="0 0 300 200" preserveAspectRatio="xMidYMid slice">
+    <rect width="300" height="200" fill="#9f9077"/>
+    <rect width="300" height="200" filter="url(#grain)" opacity=".7"/>
+    <path d="M40 170 q30 -80 110 -86 q80 6 110 86z" fill="#5e5a4a"/>
+    <g opacity=".95"><rect x="90" y="110" width="26" height="18" rx="4" fill="#2f6fb2"/><rect x="150" y="98" width="30" height="16" rx="6" fill="#c9452f"/><circle cx="200" cy="128" r="11" fill="#e3c34a"/><rect x="120" y="134" width="40" height="14" rx="5" fill="#e8e3d6"/><circle cx="170" cy="140" r="8" fill="#3c8a5b"/></g>
+  </symbol>
+  <symbol id="map" viewBox="0 0 64 64" preserveAspectRatio="xMidYMid slice">
+    <rect width="64" height="64" fill="#EFE9DA"/>
+    <path d="M-4 40 L70 22" stroke="#fff" stroke-width="7"/><path d="M22 -4 L30 70" stroke="#fff" stroke-width="5"/>
+    <path d="M-4 40 L70 22" stroke="#E2D7BC" stroke-width="1"/>
+    <ellipse cx="50" cy="52" rx="16" ry="10" fill="#CFE6D8"/><path d="M0 8 Q20 14 40 4" stroke="#BFD6E6" stroke-width="5" fill="none"/>
+    <circle cx="32" cy="32" r="9" fill="#1E8A5E" opacity=".18"/><circle cx="32" cy="32" r="4.5" fill="#16624A" stroke="#fff" stroke-width="2"/>
+  </symbol>
+</svg>
+
+<main class="page">
+
+  <header class="masthead">
+    <div>
+      <div class="kicker">Mockup v1 · Citizen app + Municipal dashboard</div>
+      <h1>Civic<em>Lens</em></h1>
+      <p>Turn a photo into action. Make your city better. An India-first reporting flow, from the photo to a resolved ticket, built on the PRD in <span class="mono">docs/prd/</span>.</p>
+    </div>
+    <div>
+      <div class="meta"><b>27 Oct 2026</b> · Android · English<br/>Example city: Pune, Maharashtra<br/>Reference: CivicLens Civic Complaint App Flow.png</div>
+      <div class="legend">
+        <span class="chip c-sub">Submitted</span><span class="chip c-asg">Assigned</span><span class="chip c-rev">Under review</span>
+        <span class="chip c-prog">In progress</span><span class="chip c-res">Resolved</span><span class="chip c-over">Overdue</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- =============== A. AUTH =============== -->
+  <section class="section">
+    <div class="section-head"><span class="marker">FLOW A</span><h2>Sign in</h2><span>Verified users only · no guest mode</span></div>
+    <div class="rail">
+
+      <!-- 1 Welcome / Login -->
+      <div class="frame">
+        <div class="phone">
+          <div class="sbar dark" style="position:relative;z-index:2"><span>9:41</span><span class="ic"><s></s><i></i></span></div>
+          <div class="scr" style="padding-top:0">
+            <div class="hero">
+              <div class="brand"><span class="mark"><svg width="24" height="24"><use href="#logo"/></svg></span><b>CivicLens</b></div>
+              <p>Turn a photo into action. Make your city better.</p>
+              <svg class="skyline" viewBox="0 0 300 120" preserveAspectRatio="none" aria-hidden="true">
+                <g fill="#11503B">
+                  <rect x="0" y="70" width="30" height="50"/><rect x="34" y="52" width="22" height="68"/>
+                  <path d="M60 120V64h34v56z"/><path d="M77 64a17 17 0 0 1-17-17 17 17 0 0 1 34 0 17 17 0 0 1-17 17z" transform="translate(0 8)"/>
+                  <rect x="76" y="28" width="2" height="12"/>
+                  <rect x="100" y="40" width="18" height="80"/><rect x="106" y="22" width="6" height="18"/>
+                  <rect x="122" y="76" width="40" height="44"/><rect x="166" y="58" width="26" height="62"/>
+                  <path d="M196 120V82l18-16 18 16v38z"/><rect x="236" y="48" width="24" height="72"/><rect x="264" y="66" width="36" height="54"/>
+                </g>
+                <g fill="#16624A"><rect x="0" y="96" width="300" height="24"/></g>
+                <g fill="#F2B544" opacity=".8"><rect x="40" y="62" width="3" height="4"/><rect x="48" y="74" width="3" height="4"/><rect x="170" y="70" width="3" height="4"/><rect x="242" y="60" width="3" height="4"/><rect x="250" y="84" width="3" height="4"/><rect x="130" y="84" width="3" height="4"/></g>
+              </svg>
+            </div>
+            <div class="sheet">
+              <h3>Welcome back</h3>
+              <div class="field"><label>Email</label><div class="input">aarav.k@example.com</div></div>
+              <div class="field"><label>Password</label><div class="input focus">••••••••••<span class="end small link">Show</span></div></div>
+              <div style="text-align:right;margin-top:8px" class="small link">Forgot password?</div>
+              <div class="btn pri" style="margin-top:14px">Log in</div>
+              <div style="text-align:center;margin-top:12px" class="small muted">New to CivicLens? <span class="link">Create account</span></div>
+              <div class="foot-note">DEMO BUILD · NOT AFFILIATED WITH ANY MUNICIPAL CORPORATION</div>
+            </div>
+          </div>
+        </div>
+        <div class="cap"><h3><i>01</i>Welcome / Login</h3><p>Email and password. The guest button from the reference is gone, and a neutral skyline replaces Stockholm.</p></div>
+      </div>
+
+      <!-- 2 Sign up -->
+      <div class="frame">
+        <div class="phone">
+          <div class="sbar"><span>9:41</span><span class="ic"><s></s><i></i></span></div>
+          <div class="scr">
+            <div class="topbar"><span class="back"><svg class="i s"><use href="#i-back"/></svg></span></div>
+            <h3 class="h-display">Create your account</h3>
+            <div class="small muted" style="margin-top:4px">Your complaints reach your city's municipal office.</div>
+            <div class="field"><label>Full name</label><div class="input">Aarav Kulkarni</div></div>
+            <div class="field"><label>Email</label><div class="input">aarav.k@example.com</div></div>
+            <div class="field"><label>Phone <small>(optional)</small></label><div class="input ph"><span class="pre">+91</span>98XXX XXXXX</div></div>
+            <div class="loc">
+              <div class="lg"><svg class="i s"><use href="#i-pin"/></svg>Your city</div>
+              <div class="casc">
+                <div class="input"><span class="step">1</span>India<svg class="i s end"><use href="#i-down"/></svg></div>
+                <div class="input"><span class="step">2</span>Maharashtra<svg class="i s end"><use href="#i-down"/></svg></div>
+                <div class="input focus"><span class="step">3</span>Pune<svg class="i s end"><use href="#i-down"/></svg></div>
+              </div>
+            </div>
+            <div class="check"><b><svg class="i s" style="stroke-width:2.6"><use href="#i-check"/></svg></b><span>I agree to the <span class="link">Terms</span> and <span class="link">Privacy Policy</span>.</span></div>
+            <div class="btn pri" style="margin-top:auto">Create account</div>
+          </div>
+        </div>
+        <div class="cap"><h3><i>02</i>Sign up</h3><p>Country, then State/UT, then City, in cascading searchable dropdowns. Phone is optional with a +91 prefix.</p></div>
+      </div>
+
+      <!-- 3 Verify -->
+      <div class="frame">
+        <div class="phone">
+          <div class="sbar"><span>9:41</span><span class="ic"><s></s><i></i></span></div>
+          <div class="scr">
+            <div class="topbar"><span class="back"><svg class="i s"><use href="#i-back"/></svg></span></div>
+            <div class="center">
+              <div class="badge-ic"><svg class="i"><use href="#i-mail"/></svg></div>
+              <h3 class="h-display">Check your inbox</h3>
+              <p class="small muted" style="line-height:1.55;margin:10px 0 0">We sent a verification link to<br/><b style="color:var(--ink)">aarav.k@example.com</b>.<br/>Verify once, then log in.</p>
+              <div class="card" style="margin-top:18px;text-align:left;width:100%;display:flex;gap:10px;align-items:center">
+                <svg class="i" style="color:var(--g7)"><use href="#i-shield"/></svg>
+                <span class="small" style="color:var(--ink-2)">You can't log in until your email is verified. This only happens once.</span>
+              </div>
+            </div>
+            <div class="btn out">Open email app</div>
+            <div class="btn ghost" style="margin-top:4px">Resend link <span class="mono muted" style="font-size:12px">0:42</span></div>
+          </div>
+        </div>
+        <div class="cap"><h3><i>03</i>Verify email</h3><p>A one-time step before the first login, with a resend timer.</p></div>
+      </div>
+
+      <!-- 4 Home -->
+      <div class="frame">
+        <div class="phone">
+          <div class="sbar dark" style="position:relative;z-index:2"><span>9:41</span><span class="ic"><s></s><i></i></span></div>
+          <div class="scr with-tabs" style="padding-top:0">
+            <div class="homehead">
+              <div class="hi">Good morning,</div>
+              <div class="name">Aarav</div>
+              <span class="citychip"><svg class="i s"><use href="#i-pin"/></svg>Pune, Maharashtra</span>
+              <span class="bell"><svg class="i"><use href="#i-bell"/></svg></span>
+            </div>
+            <div class="report">
+              <h5>See a problem on your street?</h5>
+              <p>Snap it. We'll find the right department.</p>
+              <div class="btn pri" style="height:42px"><svg class="i"><use href="#i-cam"/></svg>Report an issue</div>
+            </div>
+            <div class="stats">
+              <div class="stat"><b>2</b><span>Open</span></div>
+              <div class="stat"><b style="color:var(--amber)">1</b><span>Active</span></div>
+              <div class="stat"><b style="color:var(--g7)">4</b><span>Resolved</span></div>
+            </div>
+            <div class="sect-t"><span>Report by type</span><a>All 21 →</a></div>
+            <div class="grid6">
+              <div class="gtile t-road"><div class="gi"><svg class="i"><use href="#i-road"/></svg></div>Roads &amp; Traffic</div>
+              <div class="gtile t-water"><div class="gi"><svg class="i"><use href="#i-drop"/></svg></div>Water &amp; Drainage</div>
+              <div class="gtile t-power"><div class="gi"><svg class="i"><use href="#i-bolt"/></svg></div>Electricity</div>
+              <div class="gtile t-clean"><div class="gi"><svg class="i"><use href="#i-bin"/></svg></div>Cleanliness</div>
+              <div class="gtile t-tree"><div class="gi"><svg class="i"><use href="#i-tree"/></svg></div>Parks &amp; Trees</div>
+              <div class="gtile t-other"><div class="gi"><svg class="i"><use href="#i-more"/></svg></div>Other</div>
+            </div>
+          </div>
+          <nav class="tabs">
+            <span class="tab on"><svg class="i"><use href="#i-home"/></svg>Home</span>
+            <span class="tab"><svg class="i"><use href="#i-track"/></svg>Track</span>
+            <span class="tab"><span class="dot"></span><svg class="i"><use href="#i-bell"/></svg>Alerts</span>
+            <span class="tab"><svg class="i"><use href="#i-user"/></svg>Profile</span>
+          </nav>
+        </div>
+        <div class="cap"><h3><i>04</i>Home</h3><p>One main action plus 6 issue groups. Tapping a group preselects it in the category picker.</p></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =============== B. REPORT =============== -->
+  <section class="section">
+    <div class="section-head"><span class="marker">FLOW B</span><h2>Report a complaint</h2><span>Photo → Details → Review · AI suggests, citizen confirms</span></div>
+    <div class="rail">
+
+      <!-- 5 Capture + GPS -->
+      <div class="frame">
+        <div class="phone">
+          <div class="sbar"><span>9:41</span><span class="ic"><s></s><i></i></span></div>
+          <div class="scr">
+            <div class="topbar"><span class="back"><svg class="i s"><use href="#i-back"/></svg></span><h4>New complaint</h4></div>
+            <div class="stepper">
+              <span class="st on"><b>1</b>Photo</span><span class="st-line"></span>
+              <span class="st"><b>2</b>Details</span><span class="st-line"></span>
+              <span class="st"><b>3</b>Review</span>
+            </div>
+            <div class="vf">
+              <svg class="photo"><use href="#ph-pothole"/></svg>
+              <span class="corner tl1"></span><span class="corner tr1"></span><span class="corner bl1"></span><span class="corner br1"></span>
+              <span class="tag">CAPTURED · 28 OCT, 10:21</span>
+              <span class="retake"><svg class="i s"><use href="#i-retake"/></svg>Retake</span>
+            </div>
+            <div class="card tint gps">
+              <div class="map"><svg><use href="#map"/></svg></div>
+              <div>
+                <h6><svg class="i s"><use href="#i-gps"/></svg>Location captured</h6>
+                <div class="co">Near Shivajinagar Bus Stop, FC Road<small>Shivajinagar, Pune 411005</small></div>
+                <div class="acc">Accurate to ±6 m · <span class="link">Retry</span></div>
+              </div>
+            </div>
+            <div class="hint"><svg class="i s"><use href="#i-eye"/></svg>Try to keep faces and number plates out of the photo.</div>
+            <div class="btn pri" style="margin-top:auto">Continue</div>
+          </div>
+        </div>
+        <div class="cap"><h3><i>05</i>Photo + location</h3><p>Camera only, with preview and retake. GPS is taken once and shown as a readable address from the phone's geocoder. Coordinates are saved in the background, never faked.</p></div>
+      </div>
+
+      <!-- 6 Describe + AI -->
+      <div class="frame">
+        <div class="phone">
+          <div class="sbar"><span>9:41</span><span class="ic"><s></s><i></i></span></div>
+          <div class="scr">
+            <div class="topbar"><span class="back"><svg class="i s"><use href="#i-back"/></svg></span><h4>New complaint</h4></div>
+            <div class="stepper">
+              <span class="st done"><b><svg class="i s" style="width:11px;height:11px;stroke-width:3"><use href="#i-check"/></svg></b>Photo</span><span class="st-line on"></span>
+              <span class="st on"><b>2</b>Details</span><span class="st-line"></span>
+              <span class="st"><b>3</b>Review</span>
+            </div>
+            <div class="mini">
+              <svg class="photo"><use href="#ph-pothole"/></svg>
+              <div><div class="ok"><svg class="i s"><use href="#i-check"/></svg>Photo added</div><div class="ok" style="margin-top:4px"><svg class="i s"><use href="#i-check"/></svg>FC Road, Shivajinagar</div></div>
+            </div>
+            <div class="field"><label>Describe it <small>(optional)</small></label>
+              <div class="ta">Big pothole near the bus stop. Two-wheelers keep swerving around it.<span class="cnt">68/500</span></div>
+            </div>
+            <div class="ai">
+              <div class="ai-h"><svg class="i s"><use href="#i-spark"/></svg>AI suggestion<span class="chip nodot">Please check</span></div>
+              <div class="ai-b">
+                <dl style="margin:0">
+                  <div class="kv"><dt>Category</dt><dd>Potholes &amp; road damage<small>Roads &amp; Traffic</small></dd></div>
+                  <div class="kv"><dt>Severity</dt><dd><span class="sev s-high"><i></i>High</span></dd></div>
+                  <div class="kv"><dt>Goes to</dt><dd>Roads &amp; Engineering</dd></div>
+                </dl>
+                <div class="conf">Confidence<i></i>82%</div>
+                <ul class="obs"><li>Deep depression in the asphalt, about 1 m wide</li><li>Loose gravel around the edges</li></ul>
+                <div class="small link" style="margin-top:6px">Not right? Choose a category →</div>
+              </div>
+            </div>
+            <div class="btn pri" style="margin-top:auto">Review complaint</div>
+          </div>
+        </div>
+        <div class="cap"><h3><i>06</i>Details + AI</h3><p>AI fills in a suggestion (category from the 21, severity, department), clearly marked as a suggestion. If it fails, the manual picker opens.</p></div>
+      </div>
+
+      <!-- 7 Review -->
+      <div class="frame">
+        <div class="phone">
+          <div class="sbar"><span>9:41</span><span class="ic"><s></s><i></i></span></div>
+          <div class="scr">
+            <div class="topbar"><span class="back"><svg class="i s"><use href="#i-back"/></svg></span><h4>Review &amp; submit</h4></div>
+            <div class="stepper">
+              <span class="st done"><b><svg class="i s" style="width:11px;height:11px;stroke-width:3"><use href="#i-check"/></svg></b>Photo</span><span class="st-line on"></span>
+              <span class="st done"><b><svg class="i s" style="width:11px;height:11px;stroke-width:3"><use href="#i-check"/></svg></b>Details</span><span class="st-line on"></span>
+              <span class="st on"><b>3</b>Review</span>
+            </div>
+            <div class="strip"><svg class="photo"><use href="#ph-pothole"/></svg></div>
+            <div class="rv"><div><span class="k">Title</span><span class="v">Large pothole near bus stop</span></div><span class="ed">Edit</span></div>
+            <div class="rv"><div><span class="k">Category</span><span class="v">Potholes &amp; road damage</span></div><span class="ed">Change</span></div>
+            <div class="rv" style="display:block"><span class="k">Severity</span>
+              <div class="seg"><span>Low</span><span>Medium</span><span class="on">High</span><span>Critical</span></div>
+            </div>
+            <div class="rv"><div><span class="k">Location</span><span class="v">Near Shivajinagar Bus Stop, FC Road, Pune</span></div><span class="ed">Retry</span></div>
+            <div class="card tint dest">
+              <span class="di"><svg class="i"><use href="#i-building"/></svg></span>
+              <div><b>Pune Municipal Corporation</b><span>Roads &amp; Engineering</span></div>
+            </div>
+            <div class="sla"><svg class="i s"><use href="#i-clock"/></svg>Target: resolved within 3 days (High)</div>
+            <div class="btn pri" style="margin-top:auto">Submit complaint</div>
+          </div>
+        </div>
+        <div class="cap"><h3><i>07</i>Review &amp; submit</h3><p>Every AI field can be edited. It shows which city office gets the complaint and the SLA target. The button locks after the first tap.</p></div>
+      </div>
+
+      <!-- 8 Confirmation -->
+      <div class="frame">
+        <div class="phone">
+          <div class="sbar"><span>9:41</span><span class="ic"><s></s><i></i></span></div>
+          <div class="scr">
+            <div style="height:30px"></div>
+            <div class="ok-ic"><svg class="i"><use href="#i-check"/></svg></div>
+            <h3 class="h-display" style="text-align:center">Complaint submitted</h3>
+            <p class="small muted" style="text-align:center;margin:6px 0 0">Keep this reference to track it.</p>
+            <div class="ticket">
+              <span class="stamp">RECEIVED</span>
+              <div class="top">
+                <div class="small muted" style="font-weight:600;letter-spacing:.08em;font-size:10px">COMPLAINT REFERENCE</div>
+                <div class="ref">CL-2026-000142</div>
+              </div>
+              <div class="perf"></div>
+              <div class="bot">
+                <div><span>Department</span>Roads &amp; Engg.</div>
+                <div><span>City</span>Pune</div>
+                <div><span>Submitted</span>28 Oct, 10:24</div>
+                <div><span>Target by</span>31 Oct, 10:24</div>
+              </div>
+            </div>
+            <div class="card" style="margin-top:12px;display:flex;gap:10px;align-items:center">
+              <svg class="i" style="color:var(--g7)"><use href="#i-bell"/></svg>
+              <span class="small" style="color:var(--ink-2)">We'll notify you here whenever the status changes.</span>
+            </div>
+            <div class="btn pri" style="margin-top:auto">Track complaint</div>
+            <div class="btn ghost">Back to home</div>
+          </div>
+        </div>
+        <div class="cap"><h3><i>08</i>Confirmation</h3><p>Only shown after the server confirms. The reference sits on a ticket stub.</p></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =============== C. TRACK =============== -->
+  <section class="section">
+    <div class="section-head"><span class="marker">FLOW C</span><h2>Track &amp; resolution</h2><span>Live updates via Realtime · internal notes never shown</span></div>
+    <div class="rail">
+
+      <!-- 9 My complaints -->
+      <div class="frame">
+        <div class="phone">
+          <div class="sbar"><span>9:41</span><span class="ic"><s></s><i></i></span></div>
+          <div class="scr with-tabs">
+            <div class="topbar"><h3 class="h-display" style="font-size:22px">My complaints</h3></div>
+            <div class="search"><svg class="i s"><use href="#i-search"/></svg>Search by reference or title</div>
+            <div class="filters"><span class="f on">All · 7</span><span class="f">Open</span><span class="f">In progress</span><span class="f">Resolved</span></div>
+            <div class="item"><svg class="photo"><use href="#ph-pothole"/></svg>
+              <div><div class="ref">CL-2026-000142</div><h6>Large pothole near bus stop</h6>
+              <div class="sub"><span>Roads &amp; Engg. · 2 h ago</span><span class="chip c-prog">In progress</span></div></div></div>
+            <div class="item"><svg class="photo"><use href="#ph-drain"/></svg>
+              <div><div class="ref">CL-2026-000131</div><h6>Sewage overflowing in lane 4</h6>
+              <div class="sub"><span>Drainage · 1 d ago</span><span class="chip c-rev">Under review</span></div></div></div>
+            <div class="item"><svg class="photo"><use href="#ph-light"/></svg>
+              <div><div class="ref">CL-2026-000118</div><h6>Streetlight off on FC Road</h6>
+              <div class="sub"><span>Electrical · 2 d ago</span><span class="chip c-asg">Assigned</span></div></div></div>
+            <div class="item" style="border-bottom:0"><svg class="photo"><use href="#ph-garbage"/></svg>
+              <div><div class="ref">CL-2026-000097</div><h6>Garbage pile near market</h6>
+              <div class="sub"><span>Solid Waste · 5 d ago</span><span class="chip c-res">Resolved</span></div></div></div>
+          </div>
+          <nav class="tabs">
+            <span class="tab"><svg class="i"><use href="#i-home"/></svg>Home</span>
+            <span class="tab on"><svg class="i"><use href="#i-track"/></svg>Track</span>
+            <span class="tab"><span class="dot"></span><svg class="i"><use href="#i-bell"/></svg>Alerts</span>
+            <span class="tab"><svg class="i"><use href="#i-user"/></svg>Profile</span>
+          </nav>
+        </div>
+        <div class="cap"><h3><i>09</i>My complaints</h3><p>Only your own complaints (RLS). Filter by status, sorted by latest activity.</p></div>
+      </div>
+
+      <!-- 10 Details + timeline -->
+      <div class="frame">
+        <div class="phone">
+          <div class="sbar"><span>9:41</span><span class="ic"><s></s><i></i></span></div>
+          <div class="scr">
+            <div class="topbar"><span class="back"><svg class="i s"><use href="#i-back"/></svg></span><h4 class="mono" style="font-size:14px">CL-2026-000142</h4><span class="sp"></span><span class="live">Live</span></div>
+            <svg class="photo" style="height:92px"><use href="#ph-pothole"/></svg>
+            <div class="dhead" style="margin-top:10px"><b style="font-size:14px">Large pothole near bus stop</b></div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="chip c-prog">In progress</span><span class="chip nodot" style="background:var(--paper);color:var(--ink-2)">Roads &amp; Engg. · Pune</span></div>
+            <div class="dmeta"><div><span>Submitted</span>28 Oct, 10:24</div><div><span>Target by</span>31 Oct · on track</div></div>
+            <ol class="tl">
+              <li><span class="n"><svg class="i s" style="stroke-width:2.6"><use href="#i-check"/></svg></span><div><h5>Submitted</h5><time>28 OCT · 10:24</time></div></li>
+              <li><span class="n"><svg class="i s" style="stroke-width:2.6"><use href="#i-check"/></svg></span><div><h5>Assigned to Roads &amp; Engineering</h5><time>28 OCT · 10:24</time></div></li>
+              <li><span class="n"><svg class="i s" style="stroke-width:2.6"><use href="#i-check"/></svg></span><div><h5>Under review</h5><time>28 OCT · 14:05</time></div></li>
+              <li><span class="n now"><svg class="i s"><use href="#i-clock"/></svg></span><div><h5>In progress <span class="chip c-prog nodot" style="height:18px;font-size:10px">Latest</span></h5><time>29 OCT · 09:40</time>
+                <div class="upd">"Crew scheduled to fill the pothole today." · Roads &amp; Engg.</div></div></li>
+              <li class="pending"><span class="n wait"><svg class="i s"><use href="#i-flag"/></svg></span><div><h5 style="color:var(--ink-3)">Resolved</h5><time>PENDING</time></div></li>
+            </ol>
+          </div>
+        </div>
+        <div class="cap"><h3><i>10</i>Details + live timeline</h3><p>New status changes appear without a refresh. Officers' public updates show in amber; internal notes never reach the citizen.</p></div>
+      </div>
+
+      <!-- 11 Resolved -->
+      <div class="frame">
+        <div class="phone">
+          <div class="sbar dark" style="background:var(--g9)"><span>9:41</span><span class="ic"><s></s><i></i></span></div>
+          <div class="scr" style="padding-top:0">
+            <div class="resolved-banner">
+              <div class="ok-ic"><svg class="i"><use href="#i-check"/></svg></div>
+              <h3>Issue resolved</h3>
+              <p>Thanks for helping make Pune better.</p>
+            </div>
+            <div class="item" style="margin-top:6px"><svg class="photo"><use href="#ph-pothole"/></svg>
+              <div><div class="ref">CL-2026-000142</div><h6>Large pothole near bus stop</h6>
+              <div class="sub"><span>Roads &amp; Engineering</span><span class="chip c-res">Resolved</span></div></div></div>
+            <div class="small" style="font-weight:600;margin:10px 0 6px;color:var(--ink-2)">Resolution note</div>
+            <div class="note">Pothole filled and the surface patched. Area cleared of loose gravel.<cite>Roads &amp; Engineering · 30 Oct, 16:20</cite></div>
+            <div class="within"><svg class="i s"><use href="#i-clock"/></svg>Resolved in 2 d 6 h · within the 3-day target</div>
+            <div class="dmeta" style="margin-top:12px"><div><span>Submitted</span>28 Oct, 10:24</div><div><span>Resolved</span>30 Oct, 16:20</div></div>
+            <div class="btn out" style="margin-top:auto">View full history</div>
+          </div>
+        </div>
+        <div class="cap"><h3><i>11</i>Resolved</h3><p>The officer's resolution note, how long it took against the SLA, and the full history.</p></div>
+      </div>
+
+      <!-- 12 Manual category picker -->
+      <div class="frame">
+        <div class="phone">
+          <div class="sbar"><span>9:41</span><span class="ic"><s></s><i></i></span></div>
+          <div class="scr">
+            <div class="topbar"><span class="back"><svg class="i s"><use href="#i-back"/></svg></span><h4>Choose a category</h4></div>
+            <div class="card" style="background:var(--amber-bg);border-color:#EED7A6;font-size:11.5px;color:#5c3d00;display:flex;gap:8px;align-items:flex-start">
+              <svg class="i s" style="margin-top:1px"><use href="#i-spark"/></svg>Automatic analysis isn't available right now. Please pick what fits best.
+            </div>
+            <div class="sect-t" style="margin-top:12px"><span>Water &amp; Drainage</span><span class="small muted">Step 2 of 2</span></div>
+            <div style="display:grid;gap:6px;margin-top:8px">
+              <div class="card" style="padding:9px 10px;display:flex;gap:10px;align-items:center"><span class="gi" style="width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:#E1EEF6;color:#1C5F86"><svg class="i s"><use href="#i-drop"/></svg></span><div><b style="font-size:12.5px">Blocked drain / sewage</b><div class="small muted">Choked drain, sewage on road</div></div></div>
+              <div class="card" style="padding:9px 10px;display:flex;gap:10px;align-items:center;border:1.5px solid var(--g7);background:var(--g1)"><span class="gi" style="width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:#fff;color:var(--g7)"><svg class="i s"><use href="#i-check"/></svg></span><div><b style="font-size:12.5px">Open or broken manhole</b><div class="small muted">Missing or broken cover</div></div></div>
+              <div class="card" style="padding:9px 10px;display:flex;gap:10px;align-items:center"><span class="gi" style="width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:#E1EEF6;color:#1C5F86"><svg class="i s"><use href="#i-drop"/></svg></span><div><b style="font-size:12.5px">Waterlogging / flooding</b><div class="small muted">Water standing after rain</div></div></div>
+              <div class="card" style="padding:9px 10px;display:flex;gap:10px;align-items:center"><span class="gi" style="width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:#E1EEF6;color:#1C5F86"><svg class="i s"><use href="#i-drop"/></svg></span><div><b style="font-size:12.5px">Water pipe leakage</b><div class="small muted">Burst pipeline, leaking valve</div></div></div>
+              <div class="card" style="padding:9px 10px;display:flex;gap:10px;align-items:center"><span class="gi" style="width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:#E1EEF6;color:#1C5F86"><svg class="i s"><use href="#i-drop"/></svg></span><div><b style="font-size:12.5px">No / dirty water supply</b><div class="small muted">No water, contaminated water</div></div></div>
+            </div>
+            <div class="card" style="margin-top:8px;background:var(--red-bg);border-color:#F1C2BC;font-size:11px;color:var(--red);display:flex;gap:8px"><svg class="i s"><use href="#i-shield"/></svg>CivicLens isn't an emergency service. If anyone is in danger, call 112.</div>
+            <div class="btn pri" style="margin-top:auto">Use this category</div>
+          </div>
+        </div>
+        <div class="cap"><h3><i>12</i>Manual picker (AI fallback)</h3><p>Group first, then category. Picking a critical-type issue shows the 112 notice.</p></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =============== D. OFFICER / ADMIN WEB =============== -->
+  <section class="section">
+    <div class="section-head"><span class="marker">FLOW D</span><h2>Municipal dashboard</h2><span>Expo web · officers see their department, admins see the whole city</span></div>
+
+    <div class="browser">
+      <div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url"><svg class="i s"><use href="#i-lock"/></svg>civiclens.app/admin/complaints</span></div>
+      <div class="app">
+        <aside class="side">
+          <div class="brand"><span class="mark"><svg width="20" height="20"><use href="#logo"/></svg></span><b>CivicLens</b></div>
+          <span class="nav"><svg class="i"><use href="#i-grid"/></svg>Dashboard</span>
+          <span class="nav on"><svg class="i"><use href="#i-track"/></svg>Complaints<span class="cnt">82</span></span>
+          <span class="nav"><svg class="i"><use href="#i-building"/></svg>Departments</span>
+          <span class="nav"><svg class="i"><use href="#i-tag"/></svg>Categories</span>
+          <span class="nav"><svg class="i"><use href="#i-chart"/></svg>Analytics</span>
+          <div class="grp">ADMIN</div>
+          <span class="nav"><svg class="i"><use href="#i-users"/></svg>Users &amp; roles</span>
+          <span class="nav"><svg class="i"><use href="#i-clock"/></svg>SLA policies</span>
+          <span class="nav"><svg class="i"><use href="#i-gear"/></svg>Settings</span>
+          <div class="who"><span class="av">MD</span><div><b>Meera Deshpande</b><span>Admin · Pune MC</span></div></div>
+        </aside>
+
+        <div class="main">
+          <div class="mtop">
+            <div><h2>City service dashboard</h2><p>Live numbers from stored complaints · last updated 10:42 IST</p></div>
+            <span class="grow"></span>
+            <span class="chip c-demo">DEMO DATA</span>
+            <span class="sel"><svg class="i s"><use href="#i-building"/></svg>Pune Municipal Corporation<svg class="i s"><use href="#i-down"/></svg></span>
+            <span class="sel">Last 30 days<svg class="i s"><use href="#i-down"/></svg></span>
+          </div>
+
+          <div class="kpis">
+            <div class="kpi"><span>Total</span><b>248</b><small>30 days</small></div>
+            <div class="kpi k-new"><span>New</span><b>17</b><small>awaiting review</small></div>
+            <div class="kpi k-rev"><span>Under review</span><b>23</b><small>avg 6 h</small></div>
+            <div class="kpi k-prog"><span>In progress</span><b>42</b><small>across 9 depts</small></div>
+            <div class="kpi k-res"><span>Resolved</span><b>166</b><small>67% of total</small></div>
+            <div class="kpi k-over"><span>Overdue</span><b>9</b><small style="color:var(--red)">past SLA target</small></div>
+          </div>
+
+          <div class="two">
+            <div class="panel">
+              <h4>Open complaints by department <small>OPEN · OVERDUE</small></h4>
+              <div class="bar"><span>Roads &amp; Engineering</span><i style="--w:86%"></i><em>26 · <b>4</b></em></div>
+              <div class="bar"><span>Drainage &amp; Sewerage</span><i style="--w:64%"></i><em>19 · <b>3</b></em></div>
+              <div class="bar"><span>Solid Waste Management</span><i style="--w:47%"></i><em>14 · <b>1</b></em></div>
+              <div class="bar"><span>Street Lighting &amp; Electrical</span><i style="--w:37%"></i><em>11 · 0</em></div>
+              <div class="bar"><span>Water Supply</span><i style="--w:24%"></i><em>7 · <b>1</b></em></div>
+              <div class="bar"><span>General Municipal Review</span><i style="--w:17%"></i><em>5 · 0</em></div>
+            </div>
+            <div class="panel">
+              <h4>Most reported this week <small>OF 21 CATEGORIES</small></h4>
+              <div class="cats">
+                <div class="catrow"><span class="gi" style="background:#ECEAE4;color:#4B4A44"><svg class="i s"><use href="#i-road"/></svg></span><span>Potholes &amp; road damage<small>Roads &amp; Traffic</small></span><b>31</b></div>
+                <div class="catrow"><span class="gi" style="background:#E1EEF6;color:#1C5F86"><svg class="i s"><use href="#i-drop"/></svg></span><span>Blocked drain / sewage<small>Water &amp; Drainage</small></span><b>22</b></div>
+                <div class="catrow"><span class="gi" style="background:var(--g1);color:var(--g7)"><svg class="i s"><use href="#i-bin"/></svg></span><span>Garbage &amp; overflowing bins<small>Cleanliness &amp; Health</small></span><b>18</b></div>
+                <div class="catrow"><span class="gi" style="background:#FFF1CF;color:#8A5A00"><svg class="i s"><use href="#i-bolt"/></svg></span><span>Streetlight not working<small>Electricity &amp; Lighting</small></span><b>12</b></div>
+                <div class="catrow"><span class="gi" style="background:#E1EEF6;color:#1C5F86"><svg class="i s"><use href="#i-drop"/></svg></span><span>Waterlogging / flooding<small>Water &amp; Drainage</small></span><b>9</b></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="work">
+            <div class="panel">
+              <div class="tfil">
+                <span class="search"><svg class="i s"><use href="#i-search"/></svg>Reference or title</span>
+                <span class="sel">Status: Open<svg class="i s"><use href="#i-down"/></svg></span>
+                <span class="sel">Category: All<svg class="i s"><use href="#i-down"/></svg></span>
+                <span class="sel">Severity: All<svg class="i s"><use href="#i-down"/></svg></span>
+                <span class="tog"><i></i>Overdue first</span>
+              </div>
+              <table>
+                <thead><tr><th>Reference</th><th>Complaint</th><th>Severity</th><th>Status</th><th>Due (SLA)</th></tr></thead>
+                <tbody>
+                  <tr><td><span class="ref">CL-2026-000088</span></td><td><span class="t">Open manhole outside school<small>Drainage · Kothrud</small></span></td><td><span class="sev s-crit"><i></i>Critical</span></td><td><span class="chip c-prog">In progress</span></td><td><span class="chip c-over">Overdue 6 h</span></td></tr>
+                  <tr><td><span class="ref">CL-2026-000101</span></td><td><span class="t">Hanging live wire on pole<small>Electrical · Hadapsar</small></span></td><td><span class="sev s-crit"><i></i>Critical</span></td><td><span class="chip c-rev">Under review</span></td><td><span class="chip c-over">Overdue 2 h</span></td></tr>
+                  <tr class="sel-row"><td><span class="ref">CL-2026-000142</span></td><td><span class="t">Large pothole near bus stop<small>Roads · Shivajinagar</small></span></td><td><span class="sev s-high"><i></i>High</span></td><td><span class="chip c-prog">In progress</span></td><td><span class="due">31 Oct 10:24</span></td></tr>
+                  <tr><td><span class="ref">CL-2026-000131</span></td><td><span class="t">Sewage overflowing in lane 4<small>Drainage · Aundh</small></span></td><td><span class="sev s-high"><i></i>High</span></td><td><span class="chip c-rev">Under review</span></td><td><span class="due">30 Oct 18:02</span></td></tr>
+                  <tr><td><span class="ref">CL-2026-000147</span></td><td><span class="t">Stray cattle on main road<small>Animal Control · Baner</small> </span></td><td><span class="sev s-med"><i></i>Medium</span></td><td><span class="chip c-sub">Submitted</span></td><td><span class="due">04 Nov 09:15</span></td></tr>
+                  <tr><td><span class="ref">CL-2026-000118</span></td><td><span class="t">Streetlight off on FC Road<small>Electrical · Deccan</small></span></td><td><span class="sev s-med"><i></i>Medium</span></td><td><span class="chip c-asg">Assigned</span></td><td><span class="due">02 Nov 21:40</span></td></tr>
+                  <tr><td><span class="ref">CL-2026-000139</span></td><td><span class="t">Something leaking from a wall<small>General Review · Wakad · <span style="color:var(--red)">outside city limits</span></small></span></td><td><span class="sev s-low"><i></i>Low</span></td><td><span class="chip c-sub">Submitted</span></td><td><span class="due">11 Nov 12:30</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <aside class="mg">
+              <div class="mg-h"><span class="ref">CL-2026-000142</span><span class="chip c-prog">In progress</span><span class="grow"></span><span class="audit"><svg class="i s"><use href="#i-shield"/></svg>Audited</span></div>
+              <div class="mg-b">
+                <svg class="photo"><use href="#ph-pothole"/></svg>
+                <div class="cmp">
+                  <div class="ai-s"><span>AI suggested</span>Potholes · High</div>
+                  <div><span>Final (citizen)</span>Potholes · High</div>
+                </div>
+                <div>
+                  <div class="lbl">Move to</div>
+                  <div class="flow"><span class="d">Submitted</span><span class="d">Assigned</span><span class="d">Review</span><span class="c">In progress</span><span class="n">→ Resolved</span></div>
+                </div>
+                <div>
+                  <div class="lbl"><svg class="i s" style="color:var(--g7)"><use href="#i-eye"/></svg>Public update<span class="chip c-res nodot">Citizen sees this</span></div>
+                  <div class="tx pub">Pothole filled and the surface patched. Area cleared of loose gravel.</div>
+                </div>
+                <div>
+                  <div class="lbl"><svg class="i s" style="color:var(--amber)"><use href="#i-lock"/></svg>Internal note<span class="chip nodot" style="background:var(--amber-bg);color:var(--amber)">Staff only</span></div>
+                  <div class="tx int">Used 2 bags of cold mix. Recheck after next rain. Crew B.</div>
+                </div>
+              </div>
+              <div class="mg-f"><span class="btn out">Reassign</span><span class="btn pri"><svg class="i s" style="stroke-width:2.6"><use href="#i-check"/></svg>Mark resolved</span></div>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cap" style="max-width:1320px;margin:14px auto 0"><h3><i>13</i>Dashboard, queue, and complaint management</h3><p>Counts come from real stored data, with a "Demo data" badge for seeded rows. Overdue complaints are sorted to the top using the SLA (Critical 24 h · High 3 d · Medium 7 d · Low 14 d). "Mark resolved" needs a resolution note. The AI suggestion and the final values are shown side by side.</p></div>
+  </section>
+
+  <section class="notes">
+    <div><b>Changed from the reference</b>No "Continue as Guest". Neutral skyline instead of Stockholm. Phone is optional. Country, State/UT, and City pickers added. 6 issue groups replace the 4 quick categories. An Overdue KPI and a destination-city box are new.</div>
+    <div><b>Design language</b>Warm paper with a survey-map grid, deep civic green, and status chips that always carry a text label, not just color. Fraunces for headings, Public Sans for the UI, IBM Plex Mono for references and timestamps.</div>
+    <div><b>Scope</b>Static mockup only: no app code and no real data. Names, emails, and photos are placeholders. Pune is just an example city. Accessibility still needs testing on a device with TalkBack.</div>
+  </section>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,59 @@
+{
+  "expo": {
+    "name": "CivicLens",
+    "slug": "civiclens",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "civiclens",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "icon": "./assets/expo.icon"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0C3A2B",
+        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "backgroundImage": "./assets/images/android-icon-background.png",
+        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "output": "single",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#0C3A2B",
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 76
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "CivicLens uses your camera to photograph the issue you're reporting.",
+          "photosPermission": false,
+          "microphonePermission": false
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "CivicLens attaches your current location so the city can find the issue.",
+          "isAndroidBackgroundLocationEnabled": false,
+          "isIosBackgroundLocationEnabled": false
+        }
+      ],
+      "expo-image"
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    }
+  }
+}
