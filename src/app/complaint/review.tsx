@@ -1,18 +1,18 @@
-import { router } from 'expo-router';
-import { useRef, useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { router } from "expo-router";
+import { useRef, useState } from "react";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
-import { Photo } from '@/components/complaint-bits';
-import { Screen } from '@/components/screen';
-import { Button, Card, Icon, Notice, Stepper, T, TopBar } from '@/components/ui';
-import { colors, fonts, radius, space } from '@/constants/theme';
-import { getCategory } from '@/data/categories';
-import { CITIES } from '@/data/locations';
-import { SEVERITY_LABEL, SLA_LABEL } from '@/lib/format';
-import { useApp } from '@/store/app-store';
-import type { Severity } from '@/types';
+import { Photo } from "@/components/complaint-bits";
+import { Screen } from "@/components/screen";
+import { Button, Card, Icon, Notice, Stepper, T, TopBar } from "@/components/ui";
+import { colors, fonts, radius, space } from "@/constants/theme";
+import { getCategory } from "@/data/categories";
+import { CITIES } from "@/data/locations";
+import { SEVERITY_LABEL, SLA_LABEL } from "@/lib/format";
+import { useApp } from "@/store/app-store";
+import type { Severity } from "@/types";
 
-const SEVERITIES: Severity[] = ['low', 'medium', 'high', 'critical'];
+const SEVERITIES: Severity[] = ["low", "medium", "high", "critical"];
 
 export default function Review() {
   const { draft, updateDraft, submitDraft, user } = useApp();
@@ -20,42 +20,60 @@ export default function Review() {
   const [error, setError] = useState<string | null>(null);
   const locked = useRef(false); // blocks double taps before state re-renders
 
-  const category = getCategory(draft.category ?? 'other');
+  const category = getCategory(draft.category ?? "other");
   const loc = draft.location;
 
-  // City rule (PRD DB Â§3.0): GPS city if it's a known city, else the profile city.
-  const gpsCity = loc?.city && CITIES.some((c) => c.name.toLowerCase() === loc.city!.toLowerCase()) ? loc.city : null;
-  const city = gpsCity ?? user?.city ?? '';
+  // City rule (PRD DB §3.0): GPS city if it's a known city, else the profile city.
+  const gpsCity =
+    loc?.city &&
+    CITIES.some((c) => c.name.toLowerCase() === loc.city!.toLowerCase())
+      ? loc.city
+      : null;
+  const city = gpsCity ?? user?.city ?? "";
   const outsideLimits = !gpsCity;
-  const otherCity = gpsCity && user && gpsCity.toLowerCase() !== user.city.toLowerCase();
+  const otherCity =
+    gpsCity && user && gpsCity.toLowerCase() !== user.city.toLowerCase();
 
-  const valid = !!draft.photoUri && !!loc && !!draft.category && draft.title.trim().length >= 3;
+  const valid =
+    !!draft.photoUri &&
+    !!loc &&
+    !!draft.category &&
+    draft.title.trim().length >= 3;
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     if (locked.current || !valid) return;
     locked.current = true;
     setSubmitting(true);
     setError(null);
-    // Frontend-only: simulated network call. Success is shown only after it "returns".
-    setTimeout(() => {
-      try {
-        const c = submitDraft();
-        router.replace({ pathname: '/complaint/submitted', params: { id: c.id } });
-      } catch {
-        setError("We couldn't submit your complaint. Please try again.");
-        locked.current = false;
-        setSubmitting(false);
-      }
-    }, 1200);
+    try {
+      const c = await submitDraft();
+      router.replace({ pathname: "/complaint/submitted", params: { id: c.id } });
+    } catch {
+      setError("We couldn't submit your complaint. Please try again.");
+      locked.current = false;
+      setSubmitting(false);
+    }
   };
 
   return (
     <Screen
-      footer={<Button label={submitting ? 'Submittingâ€¦' : 'Submit complaint'} loading={submitting} disabled={!valid} onPress={onSubmit} />}>
+      footer={
+        <Button
+          label={submitting ? "Submitting..." : "Submit complaint"}
+          loading={submitting}
+          disabled={!valid}
+          onPress={onSubmit}
+        />
+      }
+    >
       <TopBar title="Review & submit" />
       <Stepper step={3} />
 
-      <Photo uri={draft.photoUri} category={category.code} style={{ height: 120 }} />
+      <Photo
+        uri={draft.photoUri}
+        category={category.code}
+        style={{ height: 120 }}
+      />
 
       <View style={styles.row}>
         <View style={{ flex: 1 }}>
@@ -78,12 +96,21 @@ export default function Review() {
           <Text style={styles.k}>Category</Text>
           <Text style={styles.v}>{category.label}</Text>
         </View>
-        <Pressable accessibilityRole="button" onPress={() => router.push('/complaint/category')} hitSlop={10}>
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => router.push("/complaint/category")}
+          hitSlop={10}
+        >
           <Text style={styles.link}>Change</Text>
         </Pressable>
       </View>
 
-      <View style={[styles.row, { display: 'flex', flexDirection: 'column', alignItems: 'stretch' }]}>
+      <View
+        style={[
+          styles.row,
+          { display: "flex", flexDirection: "column", alignItems: "stretch" },
+        ]}
+      >
         <Text style={styles.k}>Severity</Text>
         <View style={styles.seg} accessibilityRole="radiogroup">
           {SEVERITIES.map((s, i) => {
@@ -94,8 +121,23 @@ export default function Review() {
                 accessibilityRole="radio"
                 accessibilityState={{ selected: on }}
                 onPress={() => updateDraft({ severity: s })}
-                style={[styles.segItem, i < 3 && styles.segDivider, on && (s === 'critical' ? styles.segCritical : styles.segOn)]}>
-                <Text style={[styles.segText, on && { color: s === 'critical' ? colors.red : '#6D4700' }]}>{SEVERITY_LABEL[s]}</Text>
+                style={[
+                  styles.segItem,
+                  i < 3 && styles.segDivider,
+                  on &&
+                    (s === "critical" ? styles.segCritical : styles.segOn),
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.segText,
+                    on && {
+                      color: s === "critical" ? colors.red : "#6D4700",
+                    },
+                  ]}
+                >
+                  {SEVERITY_LABEL[s]}
+                </Text>
               </Pressable>
             );
           })}
@@ -105,10 +147,18 @@ export default function Review() {
       <View style={styles.row}>
         <View style={{ flex: 1 }}>
           <Text style={styles.k}>Location</Text>
-          <Text style={styles.v}>{loc?.address ?? 'Address not available'}</Text>
-          {loc?.locality ? <T variant="small" style={{ fontSize: 12 }}>{loc.locality}</T> : null}
+          <Text style={styles.v}>{loc?.address ?? "Address not available"}</Text>
+          {loc?.locality ? (
+            <T variant="small" style={{ fontSize: 12 }}>
+              {loc.locality}
+            </T>
+          ) : null}
         </View>
-        <Pressable accessibilityRole="button" onPress={() => router.back()} hitSlop={10}>
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => router.back()}
+          hitSlop={10}
+        >
           <Text style={styles.link}>Edit</Text>
         </Pressable>
       </View>
@@ -125,13 +175,15 @@ export default function Review() {
 
       {otherCity ? (
         <View style={{ marginTop: space.sm }}>
-          <Notice icon="navigate-outline">You’re in {gpsCity}, so this goes to {gpsCity}’s municipal office.</Notice>
+          <Notice icon="navigate-outline">
+            {`You're in ${gpsCity}, so this goes to ${gpsCity}'s municipal office.`}
+          </Notice>
         </View>
       ) : null}
       {outsideLimits ? (
         <View style={{ marginTop: space.sm }}>
           <Notice tone="warn" icon="map-outline">
-            This location isn’t inside a city we support yet. It’ll be sent to {city} for review.
+            {`This location isn't inside a city we support yet. It'll be sent to ${city} for review.`}
           </Notice>
         </View>
       ) : null}
@@ -139,18 +191,23 @@ export default function Review() {
       <View style={styles.sla}>
         <Icon name="time-outline" size={15} color={colors.ink2} />
         <Text style={styles.slaText}>
-          Target: resolved within {SLA_LABEL[draft.severity]} ({SEVERITY_LABEL[draft.severity]})
+          Target: resolved within {SLA_LABEL[draft.severity]} (
+          {SEVERITY_LABEL[draft.severity]})
         </Text>
       </View>
 
-      {draft.severity === 'critical' ? (
+      {draft.severity === "critical" ? (
         <View style={{ marginTop: space.sm }}>
-          <Notice tone="danger" icon="shield-outline">CivicLens isn’t an emergency service. If anyone is in danger, call 112.</Notice>
+          <Notice tone="danger" icon="shield-outline">
+            {"CivicLens isn't an emergency service. If anyone is in danger, call 112."}
+          </Notice>
         </View>
       ) : null}
       {error ? (
         <View style={{ marginTop: space.sm }}>
-          <Notice tone="danger" icon="alert-circle-outline">{error}</Notice>
+          <Notice tone="danger" icon="alert-circle-outline">
+            {error}
+          </Notice>
         </View>
       ) : null}
     </Screen>
@@ -159,27 +216,80 @@ export default function Review() {
 
 const styles = StyleSheet.create({
   row: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: space.sm,
     paddingVertical: space.md,
     borderBottomWidth: 1,
     borderBottomColor: colors.line2,
   },
-  k: { fontFamily: fonts.semibold, fontSize: 11.5, color: colors.ink3, marginBottom: 3 },
+  k: {
+    fontFamily: fonts.semibold,
+    fontSize: 11.5,
+    color: colors.ink3,
+    marginBottom: 3,
+  },
   v: { fontFamily: fonts.semibold, fontSize: 14, color: colors.ink },
-  titleInput: { fontFamily: fonts.semibold, fontSize: 14, color: colors.ink, padding: 0, minHeight: 24 },
+  titleInput: {
+    fontFamily: fonts.semibold,
+    fontSize: 14,
+    color: colors.ink,
+    padding: 0,
+    minHeight: 24,
+  },
   link: { fontFamily: fonts.semibold, fontSize: 12.5, color: colors.green7 },
-  seg: { flexDirection: 'row', borderWidth: 1.5, borderColor: colors.line, borderRadius: radius.sm, overflow: 'hidden', marginTop: 2 },
-  segItem: { flex: 1, minHeight: 40, alignItems: 'center', justifyContent: 'center' },
+  seg: {
+    flexDirection: "row",
+    borderWidth: 1.5,
+    borderColor: colors.line,
+    borderRadius: radius.sm,
+    overflow: "hidden",
+    marginTop: 2,
+  },
+  segItem: {
+    flex: 1,
+    minHeight: 40,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   segDivider: { borderRightWidth: 1, borderRightColor: colors.line },
-  segOn: { backgroundColor: '#FCE9C7', borderBottomWidth: 2, borderBottomColor: colors.amber },
-  segCritical: { backgroundColor: colors.redBg, borderBottomWidth: 2, borderBottomColor: colors.red },
+  segOn: {
+    backgroundColor: "#FCE9C7",
+    borderBottomWidth: 2,
+    borderBottomColor: colors.amber,
+  },
+  segCritical: {
+    backgroundColor: colors.redBg,
+    borderBottomWidth: 2,
+    borderBottomColor: colors.red,
+  },
   segText: { fontFamily: fonts.semibold, fontSize: 12.5, color: colors.ink2 },
-  dest: { flexDirection: 'row', alignItems: 'center', gap: space.md, marginTop: space.md },
-  destIcon: { width: 36, height: 36, borderRadius: 10, backgroundColor: colors.green7, alignItems: 'center', justifyContent: 'center' },
+  dest: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: space.md,
+    marginTop: space.md,
+  },
+  destIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: colors.green7,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   destTitle: { fontFamily: fonts.semibold, fontSize: 13.5, color: colors.ink },
-  destSub: { fontFamily: fonts.medium, fontSize: 12, color: colors.green8, marginTop: 1 },
-  sla: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: space.md },
+  destSub: {
+    fontFamily: fonts.medium,
+    fontSize: 12,
+    color: colors.green8,
+    marginTop: 1,
+  },
+  sla: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginTop: space.md,
+  },
   slaText: { fontFamily: fonts.semibold, fontSize: 12.5, color: colors.ink2 },
 });

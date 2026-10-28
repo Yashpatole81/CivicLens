@@ -29,16 +29,16 @@ export function ManagePanel({ c, showOpenLink }: { c: Complaint; showOpenLink?: 
   const show = (r: { ok: true } | { ok: false; error: string }, okText: string) =>
     setMessage(r.ok ? { tone: 'info', text: okText } : { tone: 'danger', text: r.error });
 
-  const move = (to: Status) => {
-    const r = updateStatus(c.id, to, publicUpdate);
+  const move = async (to: Status) => {
+    const r = await updateStatus(c.id, to, publicUpdate);
     show(r, `Marked ${STATUS_LABEL[to].toLowerCase()}.`);
     if (r.ok) setPublicUpdate('');
   };
 
-  const postUpdateOnly = () => {
+  const postUpdateOnly = async () => {
     if (!publicUpdate.trim()) return setMessage({ tone: 'danger', text: 'Write an update first.' });
     // A public update without a status change is recorded on the current status.
-    const r = updateStatus(c.id, c.status, publicUpdate);
+    const r = await updateStatus(c.id, c.status, publicUpdate);
     show(r, 'Update published.');
   };
 
