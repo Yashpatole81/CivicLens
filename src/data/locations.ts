@@ -1,80 +1,196 @@
 /**
- * Country → State/UT → City data for the sign-up picker.
- * Small frontend seed; the full list moves to Supabase later.
+ * India Locations Catalog: State -> City -> Ward
+ * Used for registration, complaint triage, and municipal routing.
  */
-export type Country = { code: string; name: string; phonePrefix: string };
-export type StateRegion = { id: string; country: string; name: string };
-export type City = { id: string; state: string; name: string };
 
-export const COUNTRIES: Country[] = [
-  { code: 'IN', name: 'India', phonePrefix: '+91' },
-  { code: 'SE', name: 'Sweden', phonePrefix: '+46' },
-];
+export type IndianState = { id: string; name: string };
 
-export const STATES: StateRegion[] = [
-  { id: 'IN-AP', country: 'IN', name: 'Andhra Pradesh' },
-  { id: 'IN-AS', country: 'IN', name: 'Assam' },
-  { id: 'IN-BR', country: 'IN', name: 'Bihar' },
-  { id: 'IN-CH', country: 'IN', name: 'Chandigarh' },
-  { id: 'IN-CT', country: 'IN', name: 'Chhattisgarh' },
-  { id: 'IN-DL', country: 'IN', name: 'Delhi' },
-  { id: 'IN-GA', country: 'IN', name: 'Goa' },
-  { id: 'IN-GJ', country: 'IN', name: 'Gujarat' },
-  { id: 'IN-HR', country: 'IN', name: 'Haryana' },
-  { id: 'IN-JH', country: 'IN', name: 'Jharkhand' },
-  { id: 'IN-KA', country: 'IN', name: 'Karnataka' },
-  { id: 'IN-KL', country: 'IN', name: 'Kerala' },
-  { id: 'IN-MP', country: 'IN', name: 'Madhya Pradesh' },
-  { id: 'IN-MH', country: 'IN', name: 'Maharashtra' },
-  { id: 'IN-OR', country: 'IN', name: 'Odisha' },
-  { id: 'IN-PB', country: 'IN', name: 'Punjab' },
-  { id: 'IN-RJ', country: 'IN', name: 'Rajasthan' },
-  { id: 'IN-TN', country: 'IN', name: 'Tamil Nadu' },
-  { id: 'IN-TG', country: 'IN', name: 'Telangana' },
-  { id: 'IN-UP', country: 'IN', name: 'Uttar Pradesh' },
-  { id: 'IN-UT', country: 'IN', name: 'Uttarakhand' },
-  { id: 'IN-WB', country: 'IN', name: 'West Bengal' },
-  { id: 'SE-AB', country: 'SE', name: 'Stockholm County' },
+export type City = {
+  id: string;
+  name: string;
+  state: string;
+  latitude: number;
+  longitude: number;
+};
+
+export type Ward = {
+  id: string;
+  cityId: string;
+  wardNumber: number;
+  name: string;
+};
+
+export const PHONE_PREFIX = "+91";
+
+export const STATES: IndianState[] = [
+  { id: "MH", name: "Maharashtra" },
+  { id: "KA", name: "Karnataka" },
+  { id: "DL", name: "Delhi" },
+  { id: "TG", name: "Telangana" },
+  { id: "TN", name: "Tamil Nadu" },
+  { id: "GJ", name: "Gujarat" },
+  { id: "UP", name: "Uttar Pradesh" },
+  { id: "WB", name: "West Bengal" },
+  { id: "RJ", name: "Rajasthan" },
+  { id: "MP", name: "Madhya Pradesh" },
+  { id: "KL", name: "Kerala" },
+  { id: "PB", name: "Punjab" },
+  { id: "HR", name: "Haryana" },
+  { id: "BR", name: "Bihar" },
+  { id: "AP", name: "Andhra Pradesh" },
+  { id: "OR", name: "Odisha" },
 ];
 
 export const CITIES: City[] = [
-  { id: 'visakhapatnam', state: 'IN-AP', name: 'Visakhapatnam' },
-  { id: 'vijayawada', state: 'IN-AP', name: 'Vijayawada' },
-  { id: 'guwahati', state: 'IN-AS', name: 'Guwahati' },
-  { id: 'patna', state: 'IN-BR', name: 'Patna' },
-  { id: 'chandigarh', state: 'IN-CH', name: 'Chandigarh' },
-  { id: 'raipur', state: 'IN-CT', name: 'Raipur' },
-  { id: 'new-delhi', state: 'IN-DL', name: 'New Delhi' },
-  { id: 'panaji', state: 'IN-GA', name: 'Panaji' },
-  { id: 'ahmedabad', state: 'IN-GJ', name: 'Ahmedabad' },
-  { id: 'surat', state: 'IN-GJ', name: 'Surat' },
-  { id: 'vadodara', state: 'IN-GJ', name: 'Vadodara' },
-  { id: 'gurugram', state: 'IN-HR', name: 'Gurugram' },
-  { id: 'faridabad', state: 'IN-HR', name: 'Faridabad' },
-  { id: 'ranchi', state: 'IN-JH', name: 'Ranchi' },
-  { id: 'bengaluru', state: 'IN-KA', name: 'Bengaluru' },
-  { id: 'mysuru', state: 'IN-KA', name: 'Mysuru' },
-  { id: 'kochi', state: 'IN-KL', name: 'Kochi' },
-  { id: 'thiruvananthapuram', state: 'IN-KL', name: 'Thiruvananthapuram' },
-  { id: 'bhopal', state: 'IN-MP', name: 'Bhopal' },
-  { id: 'indore', state: 'IN-MP', name: 'Indore' },
-  { id: 'mumbai', state: 'IN-MH', name: 'Mumbai' },
-  { id: 'pune', state: 'IN-MH', name: 'Pune' },
-  { id: 'nagpur', state: 'IN-MH', name: 'Nagpur' },
-  { id: 'nashik', state: 'IN-MH', name: 'Nashik' },
-  { id: 'thane', state: 'IN-MH', name: 'Thane' },
-  { id: 'bhubaneswar', state: 'IN-OR', name: 'Bhubaneswar' },
-  { id: 'ludhiana', state: 'IN-PB', name: 'Ludhiana' },
-  { id: 'amritsar', state: 'IN-PB', name: 'Amritsar' },
-  { id: 'jaipur', state: 'IN-RJ', name: 'Jaipur' },
-  { id: 'jodhpur', state: 'IN-RJ', name: 'Jodhpur' },
-  { id: 'chennai', state: 'IN-TN', name: 'Chennai' },
-  { id: 'coimbatore', state: 'IN-TN', name: 'Coimbatore' },
-  { id: 'hyderabad', state: 'IN-TG', name: 'Hyderabad' },
-  { id: 'lucknow', state: 'IN-UP', name: 'Lucknow' },
-  { id: 'kanpur', state: 'IN-UP', name: 'Kanpur' },
-  { id: 'noida', state: 'IN-UP', name: 'Noida' },
-  { id: 'dehradun', state: 'IN-UT', name: 'Dehradun' },
-  { id: 'kolkata', state: 'IN-WB', name: 'Kolkata' },
-  { id: 'stockholm', state: 'SE-AB', name: 'Stockholm' },
+  {
+    id: "pune",
+    name: "Pune",
+    state: "Maharashtra",
+    latitude: 18.5204,
+    longitude: 73.8567,
+  },
+  {
+    id: "mumbai",
+    name: "Mumbai",
+    state: "Maharashtra",
+    latitude: 19.076,
+    longitude: 72.8777,
+  },
+  {
+    id: "nagpur",
+    name: "Nagpur",
+    state: "Maharashtra",
+    latitude: 21.1458,
+    longitude: 79.0882,
+  },
+  {
+    id: "nashik",
+    name: "Nashik",
+    state: "Maharashtra",
+    latitude: 19.9975,
+    longitude: 73.7898,
+  },
+  {
+    id: "bengaluru",
+    name: "Bengaluru",
+    state: "Karnataka",
+    latitude: 12.9716,
+    longitude: 77.5946,
+  },
+  {
+    id: "mysuru",
+    name: "Mysuru",
+    state: "Karnataka",
+    latitude: 12.2958,
+    longitude: 76.6394,
+  },
+  {
+    id: "new-delhi",
+    name: "New Delhi",
+    state: "Delhi",
+    latitude: 28.6139,
+    longitude: 77.209,
+  },
+  {
+    id: "hyderabad",
+    name: "Hyderabad",
+    state: "Telangana",
+    latitude: 17.385,
+    longitude: 78.4867,
+  },
+  {
+    id: "chennai",
+    name: "Chennai",
+    state: "Tamil Nadu",
+    latitude: 13.0827,
+    longitude: 80.2707,
+  },
+  {
+    id: "ahmedabad",
+    name: "Ahmedabad",
+    state: "Gujarat",
+    latitude: 23.0225,
+    longitude: 72.5714,
+  },
+  {
+    id: "surat",
+    name: "Surat",
+    state: "Gujarat",
+    latitude: 21.1702,
+    longitude: 72.8311,
+  },
+  {
+    id: "lucknow",
+    name: "Lucknow",
+    state: "Uttar Pradesh",
+    latitude: 26.8467,
+    longitude: 80.9462,
+  },
+  {
+    id: "noida",
+    name: "Noida",
+    state: "Uttar Pradesh",
+    latitude: 28.5355,
+    longitude: 77.391,
+  },
+  {
+    id: "kolkata",
+    name: "Kolkata",
+    state: "West Bengal",
+    latitude: 22.5726,
+    longitude: 88.3639,
+  },
+  {
+    id: "jaipur",
+    name: "Jaipur",
+    state: "Rajasthan",
+    latitude: 26.9124,
+    longitude: 75.7873,
+  },
 ];
+
+export const WARDS: Ward[] = [
+  // Pune (PMC Administrative Wards)
+  { id: "w-pune-1", cityId: "pune", wardNumber: 1, name: "Aundh - Baner" },
+  { id: "w-pune-2", cityId: "pune", wardNumber: 2, name: "Shivajinagar - Ghole Road" },
+  { id: "w-pune-3", cityId: "pune", wardNumber: 3, name: "Kothrud - Bavdhan" },
+  { id: "w-pune-4", cityId: "pune", wardNumber: 4, name: "Kasba - Vishrambaug Wada" },
+  { id: "w-pune-5", cityId: "pune", wardNumber: 5, name: "Bhavani Peth" },
+  { id: "w-pune-6", cityId: "pune", wardNumber: 6, name: "Bibvewadi" },
+  { id: "w-pune-7", cityId: "pune", wardNumber: 7, name: "Dhankawadi - Sahakarnagar" },
+  { id: "w-pune-8", cityId: "pune", wardNumber: 8, name: "Hadapsar - Mundhwa" },
+  { id: "w-pune-9", cityId: "pune", wardNumber: 9, name: "Wadgaon Sheri - Kalyani Nagar" },
+  { id: "w-pune-10", cityId: "pune", wardNumber: 10, name: "Yerwada - Dhanori" },
+
+  // Mumbai (BMC Wards)
+  { id: "w-mum-1", cityId: "mumbai", wardNumber: 1, name: "Ward A (Colaba, Fort, Nariman Point)" },
+  { id: "w-mum-2", cityId: "mumbai", wardNumber: 2, name: "Ward D (Malabar Hill, Grant Road)" },
+  { id: "w-mum-3", cityId: "mumbai", wardNumber: 3, name: "Ward GS (Worli, Lower Parel)" },
+  { id: "w-mum-4", cityId: "mumbai", wardNumber: 4, name: "Ward HE (Bandra East, Khar)" },
+  { id: "w-mum-5", cityId: "mumbai", wardNumber: 5, name: "Ward HW (Bandra West, Santacruz)" },
+  { id: "w-mum-6", cityId: "mumbai", wardNumber: 6, name: "Ward KW (Andheri West, Juhu, Versova)" },
+  { id: "w-mum-7", cityId: "mumbai", wardNumber: 7, name: "Ward KE (Andheri East, Vile Parle)" },
+
+  // Bengaluru (BBMP Wards)
+  { id: "w-blr-1", cityId: "bengaluru", wardNumber: 1, name: "Yelahanka" },
+  { id: "w-blr-2", cityId: "bengaluru", wardNumber: 2, name: "Malleshwaram" },
+  { id: "w-blr-3", cityId: "bengaluru", wardNumber: 3, name: "Shivajinagar" },
+  { id: "w-blr-4", cityId: "bengaluru", wardNumber: 4, name: "Indiranagar" },
+  { id: "w-blr-5", cityId: "bengaluru", wardNumber: 5, name: "Koramangala - BTM" },
+  { id: "w-blr-6", cityId: "bengaluru", wardNumber: 6, name: "Jayanagar" },
+
+  // Delhi (MCD Zones/Wards)
+  { id: "w-del-1", cityId: "new-delhi", wardNumber: 1, name: "Rohini Zone" },
+  { id: "w-del-2", cityId: "new-delhi", wardNumber: 2, name: "Civil Lines" },
+  { id: "w-del-3", cityId: "new-delhi", wardNumber: 3, name: "Karol Bagh" },
+  { id: "w-del-4", cityId: "new-delhi", wardNumber: 4, name: "Central / Connaught Place" },
+  { id: "w-del-5", cityId: "new-delhi", wardNumber: 5, name: "South Delhi" },
+];
+
+export function getCitiesByState(stateName: string): City[] {
+  return CITIES.filter((c) => c.state.toLowerCase() === stateName.toLowerCase());
+}
+
+export function getWardsForCity(cityId: string): Ward[] {
+  return WARDS.filter((w) => w.cityId === cityId);
+}

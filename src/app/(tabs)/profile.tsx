@@ -1,22 +1,30 @@
-import { router } from 'expo-router';
-import { Platform, StyleSheet, Text, View } from 'react-native';
+import { router } from "expo-router";
+import { Platform, StyleSheet, Text, View } from "react-native";
 
-import { Screen } from '@/components/screen';
-import { Button, Card, Icon, T } from '@/components/ui';
-import { colors, fonts, space } from '@/constants/theme';
-import { COUNTRIES, STATES } from '@/data/locations';
-import { useApp } from '@/store/app-store';
+import { Screen } from "@/components/screen";
+import { Button, Card, Icon, T } from "@/components/ui";
+import { colors, fonts, space } from "@/constants/theme";
+import { STATES } from "@/data/locations";
+import { useApp } from "@/store/app-store";
 
 export default function Profile() {
   const { user, signOut } = useApp();
   if (!user) return null;
-  const initials = user.fullName.split(' ').map((p) => p[0]).slice(0, 2).join('').toUpperCase();
-  const state = STATES.find((s) => s.id === user.state)?.name;
-  const country = COUNTRIES.find((c) => c.code === user.country)?.name;
+  const initials = user.fullName
+    .split(" ")
+    .map((p) => p[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+  const stateName =
+    STATES.find((s) => s.id === user.state || s.name === user.state)?.name ??
+    user.state;
 
   return (
-    <Screen edges={['top']}>
-      <T variant="display" style={{ marginTop: space.sm }}>Profile</T>
+    <Screen edges={["top"]}>
+      <T variant="display" style={{ marginTop: space.sm }}>
+        Profile
+      </T>
       <Card style={styles.card}>
         <View style={styles.avatar}>
           <Text style={styles.initials}>{initials}</Text>
@@ -28,46 +36,82 @@ export default function Profile() {
       </Card>
 
       <Card style={{ marginTop: space.md, gap: space.md }}>
-        <Row icon="location-outline" label="Home city" value={`${user.city}, ${state ?? ''}`} />
-        <Row icon="flag-outline" label="Country" value={country ?? user.country} />
-        <Row icon="shield-checkmark-outline" label="Account" value="Citizen · email verified" />
+        <Row
+          icon="location-outline"
+          label="Home city"
+          value={`${user.city}, ${stateName ?? ""}`}
+        />
+        {user.ward ? (
+          <Row icon="business-outline" label="Municipal Ward" value={user.ward} />
+        ) : null}
+        <Row
+          icon="shield-checkmark-outline"
+          label="Account"
+          value="Citizen · email verified"
+        />
       </Card>
 
-      {Platform.OS === 'web' ? (
-        <Button kind="outline" label="Open municipal dashboard" icon="grid-outline" style={{ marginTop: space.lg }} onPress={() => router.push('/admin')} />
+      {Platform.OS === "web" ? (
+        <Button
+          kind="outline"
+          label="Open municipal dashboard"
+          icon="grid-outline"
+          style={{ marginTop: space.lg }}
+          onPress={() => router.push("/admin")}
+        />
       ) : null}
 
       <Button
-        kind="outline"
+        kind="danger"
         label="Log out"
         icon="log-out-outline"
-        style={{ marginTop: space.lg }}
+        style={{ marginTop: space.md }}
         onPress={() => {
           signOut();
-          router.replace('/welcome');
+          router.replace("/welcome");
         }}
       />
-      <T variant="mono" style={{ textAlign: 'center', marginTop: space.xl, fontSize: 10 }}>
-        CIVICLENS DEMO · NOT AFFILIATED WITH ANY MUNICIPAL CORPORATION
-      </T>
     </Screen>
   );
 }
 
-function Row({ icon, label, value }: { icon: Parameters<typeof Icon>[0]['name']; label: string; value: string }) {
+function Row({
+  icon,
+  label,
+  value,
+}: {
+  icon: any;
+  label: string;
+  value: string;
+}) {
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
-      <Icon name={icon} size={18} color={colors.green7} />
+    <View style={styles.row}>
+      <Icon name={icon} size={18} color={colors.ink3} />
       <View style={{ flex: 1 }}>
-        <T variant="caption">{label}</T>
-        <T variant="body">{value}</T>
+        <Text style={styles.label}>{label}</Text>
+        <Text style={styles.value}>{value}</Text>
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  card: { flexDirection: 'row', alignItems: 'center', gap: space.md, marginTop: space.lg },
-  avatar: { width: 52, height: 52, borderRadius: 26, backgroundColor: colors.green7, alignItems: 'center', justifyContent: 'center' },
-  initials: { fontFamily: fonts.bold, fontSize: 18, color: '#fff' },
+  card: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: space.md,
+    marginTop: space.md,
+  },
+  avatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: colors.green7,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  initials: { fontFamily: fonts.bold, fontSize: 16, color: "#fff" },
+  row: { flexDirection: "row", alignItems: "center", gap: space.md },
+  label: { fontFamily: fonts.medium, fontSize: 11.5, color: colors.ink3 },
+  value: { fontFamily: fonts.semibold, fontSize: 13.5, color: colors.ink },
 });

@@ -6,7 +6,13 @@ import { Screen } from "@/components/screen";
 import { Select } from "@/components/select";
 import { Button, Field, Icon, T, TopBar } from "@/components/ui";
 import { colors, fonts, radius, space } from "@/constants/theme";
-import { CITIES, COUNTRIES, STATES } from "@/data/locations";
+import {
+  CITIES,
+  PHONE_PREFIX,
+  STATES,
+  getCitiesByState,
+  getWardsForCity,
+} from "@/data/locations";
 import { useApp } from "@/store/app-store";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -26,21 +32,32 @@ export default function Register() {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
-  const [country, setCountry] = useState<string | null>("IN");
   const [state, setState] = useState<string | null>(null);
   const [city, setCity] = useState<string | null>(null);
+  const [ward, setWard] = useState<string | null>(null);
   const [terms, setTerms] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
   const [loading, setLoading] = useState(false);
 
-  const prefix = COUNTRIES.find((c) => c.code === country)?.phonePrefix;
-  const stateOptions = STATES.filter((s) => s.country === country).map((s) => ({
+  const selectedStateObj = STATES.find((s) => s.id === state);
+  const stateCities = selectedStateObj
+    ? getCitiesByState(selectedStateObj.name)
+    : [];
+  const cityWards = city ? getWardsForCity(city) : [];
+
+  const stateOptions = STATES.map((s) => ({
     value: s.id,
     label: s.name,
   }));
-  const cityOptions = CITIES.filter((c) => c.state === state).map((c) => ({
+
+  const cityOptions = stateCities.map((c) => ({
     value: c.id,
     label: c.name,
+  }));
+
+  const wardOptions = cityWards.map((w) => ({
+    value: w.id,
+    label: `Ward ${w.wardNumber}: ${w.name}`,
   }));
 
   const onSubmit = async () => {
@@ -50,22 +67,25 @@ export default function Register() {
     if (password.length < MIN_PASSWORD)
       e.password = `Use at least ${MIN_PASSWORD} characters.`;
     if (confirm !== password) e.confirm = "Passwords don't match.";
-    if (!city) e.city = "Choose your country, state and city.";
+    if (!state || !city) e.city = "Choose your state and city.";
     if (!terms) e.terms = "Please accept the Terms and Privacy Policy.";
     setErrors(e);
     if (Object.keys(e).length) return;
 
     setLoading(true);
     const cityRow = CITIES.find((c) => c.id === city)!;
+    const wardRow = cityWards.find((w) => w.id === ward);
 
     const res = await register(
       {
         fullName: name.trim(),
         email: email.trim().toLowerCase(),
-        country: country!,
-        state: state!,
+        country: "IN",
+        state: selectedStateObj?.name ?? "Maharashtra",
         city: cityRow.name,
         cityId: cityRow.id,
+        ward: wardRow ? wardRow.name : null,
+        wardId: wardRow ? wardRow.id : null,
         phone: phone.trim() ? phone.trim() : null,
       },
       password,
@@ -90,7 +110,7 @@ export default function Register() {
       <TopBar />
       <T variant="display">Create your account</T>
       <T variant="small" style={{ marginTop: 4 }}>
-        Your complaints reach your city’s municipal office.
+        Your complaints reach your city’s municipal corporation & ward office.
       </T>
 
       {errors.submit ? (
@@ -120,7 +140,7 @@ export default function Register() {
       <Field
         label="Phone"
         hint="(optional)"
-        prefix={prefix}
+        prefix={PHONE_PREFIX}
         value={phone}
         onChangeText={setPhone}
         placeholder="98XXX XXXXX"
@@ -148,38 +168,38 @@ export default function Register() {
       <View style={styles.loc}>
         <View style={styles.locHead}>
           <Icon name="location-outline" size={15} color={colors.green8} />
-          <Text style={styles.locTitle}>Your city</Text>
+          <Text style={styles.locTitle}>Your Location (State ➔ City ➔ Ward)</Text>
         </View>
         <View style={{ gap: space.sm }}>
           <Select
             step={1}
-            placeholder="Country"
-            value={country}
-            options={COUNTRIES.map((c) => ({ value: c.code, label: c.name }))}
+            placeholder="State / UT"
+            value={state}
+            options={stateOptions}
             onChange={(v) => {
-              setCountry(v);
-              setState(null);
+              setState(v);
               setCity(null);
+              setWard(null);
             }}
           />
           <Select
             step={2}
-            placeholder="State / UT"
-            value={state}
-            options={stateOptions}
-            disabled={!country}
+            placeholder="City / Municipality"
+            value={city}
+            options={cityOptions}
+            disabled={!state}
             onChange={(v) => {
-              setState(v);
-              setCity(null);
+              setCity(v);
+              setWard(null);
             }}
           />
           <Select
             step={3}
-            placeholder="City"
-            value={city}
-            options={cityOptions}
-            disabled={!state}
-            onChange={setCity}
+            placeholder="Municipal Ward / Prabhag (optional)"
+            value={ward}
+            options={wardOptions}
+            disabled={!city || wardOptions.length === 0}
+            onChange={setWard}
           />
         </View>
         {errors.city ? <Text style={styles.error}>{errors.city}</Text> : null}

@@ -49,8 +49,9 @@ async function reverseGeocode(latitude: number, longitude: number) {
       address: line || g.formattedAddress || null,
       locality: [g.district ?? g.subregion, tail].filter(Boolean).join(', ') || null,
       city: g.city ?? null,
+      postalCode: g.postalCode ?? null,
     };
   } catch {
-    return { address: null, locality: null, city: null };
+    return { address: null, locality: null, city: null, postalCode: null };
   }
 }
