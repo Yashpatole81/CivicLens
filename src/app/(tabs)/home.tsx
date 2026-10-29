@@ -48,7 +48,7 @@ export default function Home() {
         <View style={styles.body}>
           <View style={styles.report}>
             <T variant="heading" style={{ fontSize: 16 }}>See a problem on your street?</T>
-            <T variant="small" style={{ marginTop: 2, marginBottom: space.md }}>Snap it. We’ll find the right department.</T>
+            <T variant="small" style={{ marginTop: 2, marginBottom: space.md }}>{"Snap it. We'll find the right department."}</T>
             <Button label="Report an issue" icon="camera-outline" onPress={() => startComplaint()} />
           </View>
 

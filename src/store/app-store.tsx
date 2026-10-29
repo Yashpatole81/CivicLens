@@ -231,7 +231,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
           email: u.email,
           password,
           fullName: u.fullName,
+          city: u.city,
           cityId: u.cityId,
+          ward: u.ward,
           wardId: u.wardId ?? undefined,
           phone: u.phone ?? undefined,
         });

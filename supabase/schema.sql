@@ -256,16 +256,58 @@ $$;
 create or replace function public.handle_new_user()
 returns trigger
 language plpgsql security definer set search_path = public as $$
+declare
+  resolved_city_id uuid := null;
+  resolved_ward_id uuid := null;
+  raw_city text := new.raw_user_meta_data->>'city_id';
+  raw_ward text := new.raw_user_meta_data->>'ward_id';
+  city_name text := new.raw_user_meta_data->>'city';
+  ward_name text := new.raw_user_meta_data->>'ward';
 begin
+  -- 1. Resolve City ID (UUID, slug or name)
+  if raw_city ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$' then
+    resolved_city_id := raw_city::uuid;
+  elsif city_name is not null then
+    select id into resolved_city_id from public.cities
+    where lower(name) = lower(city_name)
+    limit 1;
+  elsif raw_city is not null then
+    select id into resolved_city_id from public.cities
+    where lower(name) = lower(raw_city) or lower(name) like '%' || lower(raw_city) || '%'
+    limit 1;
+  end if;
+
+  -- 2. Resolve Ward ID (UUID or by name/number)
+  if raw_ward ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$' then
+    resolved_ward_id := raw_ward::uuid;
+  elsif resolved_city_id is not null and ward_name is not null then
+    select id into resolved_ward_id from public.wards
+    where city_id = resolved_city_id and lower(name) = lower(ward_name)
+    limit 1;
+  end if;
+
+  -- 3. Upsert Profile
   insert into public.profiles (id, full_name, role, city_id, ward_id, phone)
   values (
     new.id,
     coalesce(new.raw_user_meta_data->>'full_name', 'Citizen User'),
     'citizen',
-    (new.raw_user_meta_data->>'city_id')::uuid,
-    (new.raw_user_meta_data->>'ward_id')::uuid,
-    new.raw_user_meta_data->>'phone'
-  );
+    resolved_city_id,
+    resolved_ward_id,
+    nullif(new.raw_user_meta_data->>'phone', '')
+  )
+  on conflict (id) do update
+    set full_name = excluded.full_name,
+        city_id = coalesce(excluded.city_id, public.profiles.city_id),
+        ward_id = coalesce(excluded.ward_id, public.profiles.ward_id),
+        phone = coalesce(excluded.phone, public.profiles.phone);
+
+  return new;
+exception when others then
+  -- Fail-safe: ensure user registration in auth.users NEVER fails
+  insert into public.profiles (id, full_name, role)
+  values (new.id, coalesce(new.raw_user_meta_data->>'full_name', 'Citizen User'), 'citizen')
+  on conflict (id) do nothing;
   return new;
 end;
 $$;

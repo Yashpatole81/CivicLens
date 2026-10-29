@@ -122,7 +122,7 @@ export default function Describe() {
           {analyzing ? (
             <View style={styles.row}>
               <ActivityIndicator color={colors.green7} />
-              <T variant="small">Analysing your report…</T>
+              <T variant="small">Analysing your report...</T>
             </View>
           ) : category ? (
             <>
@@ -143,7 +143,7 @@ export default function Describe() {
             </>
           ) : suggestion?.source === "fallback" ? (
             <Notice tone="warn" icon="information-circle-outline">
-              We couldn’t work out the issue type automatically. Please pick a
+              {"We couldn't work out the issue type automatically. Please pick a"}
               category.
             </Notice>
           ) : (

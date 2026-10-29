@@ -158,7 +158,7 @@ export function ManagePanel({ c, showOpenLink }: { c: Complaint; showOpenLink?: 
             </View>
           </>
         ) : (
-          <Notice tone="warn" icon="lock-closed-outline">This complaint belongs to another department. You can’t change it.</Notice>
+          <Notice tone="warn" icon="lock-closed-outline">{"This complaint belongs to another department. You can't change it."}</Notice>
         )}
 
         {message ? <Notice tone={message.tone} icon={message.tone === 'info' ? 'checkmark-circle-outline' : 'alert-circle-outline'}>{message.text}</Notice> : null}

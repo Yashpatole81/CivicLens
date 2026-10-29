@@ -110,7 +110,7 @@ export default function Register() {
       <TopBar />
       <T variant="display">Create your account</T>
       <T variant="small" style={{ marginTop: 4 }}>
-        Your complaints reach your city’s municipal corporation & ward office.
+        {"Your complaints reach your city's municipal corporation & ward office."}
       </T>
 
       {errors.submit ? (

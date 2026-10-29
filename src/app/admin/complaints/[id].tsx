@@ -22,7 +22,7 @@ export default function AdminComplaint() {
   if (!c || !canView(staff, c)) {
     return (
       <AdminPage title="Complaint not found">
-        <T variant="small">It doesn’t exist, or it isn’t assigned to your department.</T>
+        <T variant="small">{"It doesn't exist, or it isn't assigned to your department."}</T>
         <Back />
       </AdminPage>
     );

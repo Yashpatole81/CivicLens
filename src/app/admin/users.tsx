@@ -38,7 +38,7 @@ export default function Users() {
               </View>
               <Text style={[a.mono, { width: 240 }]}>{u.email}</Text>
               <View style={{ width: 110 }}><Chip label={u.role.toUpperCase()} fg={fg} bg={bg} /></View>
-              <Text style={[a.mono, { width: 240 }]}>{u.department ?? (u.role === 'admin' ? 'All departments' : '—')}</Text>
+              <Text style={[a.mono, { width: 240 }]}>{u.department ?? (u.role === 'admin' ? 'All departments' : ' - ')}</Text>
             </View>
           );
         })}

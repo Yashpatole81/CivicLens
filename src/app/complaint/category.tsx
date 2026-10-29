@@ -126,7 +126,7 @@ export default function CategoryPicker() {
           {groupHasCritical ? (
             <View style={{ marginTop: space.md }}>
               <Notice tone="danger" icon="shield-outline">
-                CivicLens isn’t an emergency service. If anyone is in danger,
+                {"CivicLens isn't an emergency service. If anyone is in danger,"}
                 call 112.
               </Notice>
             </View>

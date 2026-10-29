@@ -46,9 +46,9 @@ export default function Analytics() {
     <AdminPage title="Analytics" subtitle="Calculated from the complaints in your scope">
       <View style={a.row}>
         <Kpi label="Open now" value={list.filter((c) => isOpen(c.status)).length} />
-        <Kpi label="Resolved on time" value={done.length ? `${Math.round((onTime / done.length) * 100)}%` : '—'} sub={`${onTime} of ${done.length}`} bar={colors.green5} />
-        <Kpi label="Avg. resolution time" value={done.length ? formatDuration(new Date(0).toISOString(), new Date(avgMs).toISOString()) : '—'} bar={colors.blue} />
-        <Kpi label="AI category kept" value={aiRated.length ? `${Math.round((aiAgree / aiRated.length) * 100)}%` : '—'} sub={`${aiAgree} of ${aiRated.length} with an AI suggestion`} bar={colors.violet} />
+        <Kpi label="Resolved on time" value={done.length ? `${Math.round((onTime / done.length) * 100)}%` : ' - '} sub={`${onTime} of ${done.length}`} bar={colors.green5} />
+        <Kpi label="Avg. resolution time" value={done.length ? formatDuration(new Date(0).toISOString(), new Date(avgMs).toISOString()) : ' - '} bar={colors.blue} />
+        <Kpi label="AI category kept" value={aiRated.length ? `${Math.round((aiAgree / aiRated.length) * 100)}%` : ' - '} sub={`${aiAgree} of ${aiRated.length} with an AI suggestion`} bar={colors.violet} />
       </View>
 
       <Panel title="New complaints per day" right={`LAST ${DAYS} DAYS`}>

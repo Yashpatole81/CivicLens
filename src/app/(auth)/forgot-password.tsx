@@ -35,7 +35,7 @@ export default function ForgotPassword() {
       <TopBar />
       <T variant="display">Reset your password</T>
       <T variant="small" style={{ marginTop: 4 }}>
-        We’ll email you a link to set a new password.
+        {"We'll email you a link to set a new password."}
       </T>
       <Field
         label="Email"

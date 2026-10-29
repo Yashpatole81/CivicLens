@@ -53,7 +53,7 @@ export function QueueTable({
               {late ? (
                 <Chip label={`Overdue ${hoursLate} h`} fg={colors.red} bg={colors.redBg} dot />
               ) : (
-                <Text style={a.mono}>{isOpen(c.status) ? formatDateTime(dueAt(c.createdAt, c.severity)) : '—'}</Text>
+                <Text style={a.mono}>{isOpen(c.status) ? formatDateTime(dueAt(c.createdAt, c.severity)) : ' - '}</Text>
               )}
             </View>
           </Pressable>

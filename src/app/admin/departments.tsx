@@ -34,7 +34,7 @@ export default function Departments() {
         late: items.filter((c) => isOverdue(c.createdAt, c.severity, c.status, nowDate)).length,
         resolved: done.length,
         onTimePct: done.length ? Math.round((onTime / done.length) * 100) : null,
-        avg: avgHours != null ? formatDuration(new Date(0).toISOString(), new Date(avgHours * 3600000).toISOString()) : '—',
+        avg: avgHours != null ? formatDuration(new Date(0).toISOString(), new Date(avgHours * 3600000).toISOString()) : ' - ',
         officers: DEMO_STAFF.filter((s) => s.department === dept).length,
         categories: CATEGORIES.filter((c) => c.department === dept).length,
       };
@@ -62,7 +62,7 @@ export default function Departments() {
             <Text style={[a.mono, { width: 70, textAlign: 'right' }]}>{r.open}</Text>
             <Text style={[a.mono, { width: 80, textAlign: 'right', color: r.late ? colors.red : colors.ink2 }]}>{r.late}</Text>
             <Text style={[a.mono, { width: 90, textAlign: 'right' }]}>{r.resolved}</Text>
-            <Text style={[a.mono, { width: 100, textAlign: 'right' }]}>{r.onTimePct == null ? '—' : `${r.onTimePct}%`}</Text>
+            <Text style={[a.mono, { width: 100, textAlign: 'right' }]}>{r.onTimePct == null ? ' - ' : `${r.onTimePct}%`}</Text>
             <Text style={[a.mono, { width: 110, textAlign: 'right' }]}>{r.avg}</Text>
             <Text style={[a.mono, { width: 90, textAlign: 'right' }]}>{r.officers}</Text>
           </View>

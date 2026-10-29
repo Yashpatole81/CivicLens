@@ -76,7 +76,7 @@ export function Timeline({ history, pendingResolved }: { history: HistoryEntry[]
                 {latest ? <Text style={styles.tlLatest}>Latest</Text> : null}
               </View>
               <Text style={styles.tlTime}>{formatStamp(h.at)}</Text>
-              {h.update ? <Text style={styles.tlUpdate}>“{h.update}”</Text> : null}
+              {h.update ? <Text style={styles.tlUpdate}>{`"${h.update}"`}</Text> : null}
             </View>
           </View>
         );

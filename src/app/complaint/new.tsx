@@ -73,7 +73,7 @@ export default function NewComplaint() {
           <Corners />
           {capturedAt ? (
             <View style={styles.tag}>
-              <Text style={styles.tagText}>CAPTURED Â· {formatDateTime(capturedAt).toUpperCase()}</Text>
+              <Text style={styles.tagText}>CAPTURED · {formatDateTime(capturedAt).toUpperCase()}</Text>
             </View>
           ) : null}
           <Pressable accessibilityRole="button" accessibilityLabel="Retake photo" onPress={takePhoto} style={styles.retake}>
@@ -89,7 +89,7 @@ export default function NewComplaint() {
           </View>
           <T variant="heading" style={{ marginTop: space.md }}>Take a photo of the issue</T>
           <T variant="small" style={{ textAlign: 'center', marginTop: 4, paddingHorizontal: space.xl }}>
-            We use your camera to capture it. Gallery photos aren’t accepted.
+            {"We use your camera to capture it. Gallery photos aren't accepted."}
           </T>
         </Pressable>
       )}
@@ -106,7 +106,7 @@ export default function NewComplaint() {
       ) : null}
       {cam === 'error' ? (
         <View style={{ marginTop: space.md }}>
-          <Notice tone="danger" icon="alert-circle-outline">The camera couldn’t open. Please try again.</Notice>
+          <Notice tone="danger" icon="alert-circle-outline">{"The camera couldn't open. Please try again."}</Notice>
         </View>
       ) : null}
 
@@ -142,7 +142,7 @@ function LocationCard({
     return (
       <Card tint style={styles.locCard}>
         <ActivityIndicator color={colors.green7} />
-        <T variant="label" style={{ color: colors.green8 }}>Getting your locationâ€¦</T>
+        <T variant="label" style={{ color: colors.green8 }}>Getting your location...</T>
       </Card>
     );
   }
@@ -175,7 +175,7 @@ function LocationCard({
           {location.locality ? <T variant="small" style={{ fontSize: 12, color: colors.ink2 }}>{location.locality}</T> : null}
           <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
             <T variant="small" style={{ fontSize: 12 }}>
-              {location.accuracyM != null ? `Accurate to Â±${location.accuracyM} m Â· ` : ''}
+              {location.accuracyM != null ? `Accurate to ±${location.accuracyM} m · ` : ''}
             </T>
             <Pressable accessibilityRole="button" accessibilityLabel="Retry location" onPress={onRetry} hitSlop={10}>
               <Text style={styles.retry}>Retry</Text>
@@ -186,7 +186,7 @@ function LocationCard({
       {lowAccuracy ? (
         <View style={{ marginTop: space.sm }}>
           <Notice tone="warn" icon="warning-outline">
-            GPS accuracy is low (Â±{location.accuracyM} m). You can retry outdoors, or continue anyway.
+            GPS accuracy is low (±{location.accuracyM} m). You can retry outdoors, or continue anyway.
           </Notice>
         </View>
       ) : null}
