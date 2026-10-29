@@ -1,5 +1,5 @@
 -- ==============================================================================
--- CivicLens: Production-Ready Database RPC Functions (Transactional & Secure)
+-- CivicLens: Production-Ready Database RPC Functions (India-Only & Wards Enabled)
 -- Enforces: Atomic Reference Generation, Idempotency, Deterministic Routing,
 -- Strict Status Machine Transitions, and Audit Trails.
 -- ==============================================================================
@@ -42,16 +42,7 @@ declare
   dept_id uuid;
   cat_dept_key text;
 begin
-  -- Step 1: Check city override route
-  select department_id into dept_id
-  from public.department_routes
-  where city_id = p_city_id and category_code = p_category_code;
-
-  if dept_id is not null then
-    return dept_id;
-  end if;
-
-  -- Step 2: Check standard department matching category department_key
+  -- Step 1: Check standard department matching category department_key
   select department_key into cat_dept_key
   from public.categories
   where code = p_category_code;
@@ -65,7 +56,7 @@ begin
     return dept_id;
   end if;
 
-  -- Step 3: Fallback to General Municipal Review department in that city
+  -- Step 2: Fallback to General Municipal Review department in that city
   select id into dept_id
   from public.departments
   where city_id = p_city_id and is_general_review = true and is_active = true
@@ -79,7 +70,7 @@ begin
 end;
 $$;
 
--- 3. Production RPC: Submit Complaint (Atomic, Idempotent, Auto-routed)
+-- 3. Production RPC: Submit Complaint (Atomic, Idempotent, Auto-routed, Ward-tagged)
 create or replace function public.submit_complaint(
   p_idempotency_key text,
   p_title text,
@@ -96,6 +87,7 @@ create or replace function public.submit_complaint(
   p_postal_code text,
   p_photo_path text,
   p_city_id uuid,
+  p_ward_id uuid default null,
   p_city_source text default 'gps',
   p_outside_city_limits boolean default false
 )
@@ -141,6 +133,7 @@ begin
     reference,
     citizen_id,
     city_id,
+    ward_id,
     city_source,
     outside_city_limits,
     title,
@@ -163,6 +156,7 @@ begin
     new_reference,
     caller_id,
     p_city_id,
+    p_ward_id,
     p_city_source,
     p_outside_city_limits,
     p_title,
@@ -196,7 +190,7 @@ begin
     null,
     'submitted',
     caller_id,
-    'Complaint submitted successfully.'
+    'Complaint registered with municipal corporation.'
   );
 
   -- Notification for citizen
@@ -224,7 +218,13 @@ begin
     'complaint_submitted',
     'complaint',
     new_complaint_id,
-    jsonb_build_object('reference', new_reference, 'severity', p_severity, 'category', p_category)
+    jsonb_build_object(
+      'reference', new_reference,
+      'severity', p_severity,
+      'category', p_category,
+      'city_id', p_city_id,
+      'ward_id', p_ward_id
+    )
   );
 
   return jsonb_build_object(
@@ -284,7 +284,7 @@ begin
     raise exception 'Permission denied: You can only update complaints for your assigned department.';
   end if;
 
-  -- State machine transition rules (PRD Screen 10 / NFR-REL-002)
+  -- State machine transition rules
   if comp.status = 'submitted' and p_new_status = 'assigned' then
     is_transition_valid := true;
   elsif comp.status = 'assigned' and p_new_status in ('under_review', 'rejected') then
@@ -296,7 +296,6 @@ begin
   elsif comp.status = 'resolved' and p_new_status = 'closed' then
     is_transition_valid := true;
   elsif caller_role = 'admin' then
-    -- Admin override transitions (e.g. reopen or reassign)
     is_transition_valid := true;
   end if;
 
@@ -304,12 +303,10 @@ begin
     raise exception 'Invalid status transition from % to %', comp.status, p_new_status;
   end if;
 
-  -- Resolution requirement check
   if p_new_status = 'resolved' and (p_resolution_notes is null or char_length(trim(p_resolution_notes)) < 5) then
     raise exception 'Resolution notes are required when resolving a complaint (min 5 chars).';
   end if;
 
-  -- Update complaint
   update public.complaints
   set
     status = p_new_status,
@@ -320,7 +317,6 @@ begin
     updated_at = now()
   where id = p_complaint_id;
 
-  -- Status History
   insert into public.complaint_status_history (
     complaint_id,
     previous_status,
@@ -335,7 +331,6 @@ begin
     p_citizen_update
   );
 
-  -- Citizen Notification
   insert into public.notifications (
     recipient_id,
     complaint_id,
@@ -348,7 +343,6 @@ begin
     'Complaint ' || comp.reference || ' status changed to ' || replace(p_new_status::text, '_', ' ') || '.'
   );
 
-  -- Audit Log
   insert into public.audit_logs (
     actor_id,
     action,
@@ -375,4 +369,3 @@ begin
   );
 end;
 $$;
-

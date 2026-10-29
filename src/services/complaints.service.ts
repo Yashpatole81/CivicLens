@@ -18,6 +18,7 @@ export type SubmitComplaintPayload = {
   postalCode?: string | null;
   photoPath: string;
   cityId: string;
+  wardId?: string | null;
   citySource?: "gps" | "profile";
   outsideCityLimits?: boolean;
 };
@@ -46,6 +47,7 @@ export const ComplaintsService = {
         p_postal_code: payload.postalCode || null,
         p_photo_path: payload.photoPath,
         p_city_id: payload.cityId,
+        p_ward_id: payload.wardId || null,
         p_city_source: payload.citySource ?? "gps",
         p_outside_city_limits: payload.outsideCityLimits ?? false,
       });

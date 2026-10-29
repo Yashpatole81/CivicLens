@@ -9,6 +9,7 @@ export type UserProfile = {
   role: UserRole;
   departmentId: string | null;
   cityId: string | null;
+  wardId: string | null;
   phone: string | null;
   createdAt: string;
 };
@@ -18,6 +19,7 @@ export type SignUpPayload = {
   password: string;
   fullName: string;
   cityId: string;
+  wardId?: string | null;
   phone?: string;
 };
 
@@ -32,6 +34,7 @@ export const AuthService = {
           data: {
             full_name: payload.fullName.trim(),
             city_id: payload.cityId,
+            ward_id: payload.wardId || null,
             phone: payload.phone?.trim() || null,
           },
         },
@@ -89,7 +92,7 @@ export const AuthService = {
     try {
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, full_name, role, department_id, city_id, phone, created_at")
+        .select("id, full_name, role, department_id, city_id, ward_id, phone, created_at")
         .eq("id", userId)
         .single();
 
@@ -101,6 +104,7 @@ export const AuthService = {
         role: data.role as UserRole,
         departmentId: data.department_id,
         cityId: data.city_id,
+        wardId: data.ward_id,
         phone: data.phone,
         createdAt: data.created_at,
       });

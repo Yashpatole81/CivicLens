@@ -32,6 +32,8 @@ export type User = {
   state: string;
   city: string;
   cityId: string;
+  ward?: string | null;
+  wardId?: string | null;
   id?: string;
   phone?: string | null;
   role?: string;
@@ -44,6 +46,9 @@ export type DraftLocation = {
   address: string | null;
   locality: string | null;
   city: string | null;
+  wardId?: string | null;
+  ward?: string | null;
+  postalCode?: string | null;
 };
 
 export type Draft = {
@@ -227,6 +232,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
           password,
           fullName: u.fullName,
           cityId: u.cityId,
+          wardId: u.wardId ?? undefined,
           phone: u.phone ?? undefined,
         });
         if (!res.data) {
@@ -282,8 +288,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
           locationAccuracyM: loc.accuracyM ?? null,
           addressText: loc.address ?? null,
           locality: loc.locality ?? null,
+          postalCode: loc.postalCode ?? null,
           photoPath,
           cityId: user?.cityId ?? "c1111111-1111-1111-1111-111111111101",
+          wardId: loc.wardId ?? user?.wardId ?? null,
         });
 
         if (rpcRes.data) {

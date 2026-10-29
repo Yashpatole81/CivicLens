@@ -1,6 +1,6 @@
 -- ==============================================================================
--- CivicLens: Complete Supabase Database Schema, Functions, RLS & Seed Data
--- Architecture & Specs based on REFERENCE/docs/prd/04-database-design.md
+-- CivicLens: Production Database Schema (India-Only & Municipal Wards Enabled)
+-- Hierarchy: Ward -> City -> State
 -- ==============================================================================
 
 -- 1. EXTENSIONS
@@ -44,42 +44,36 @@ exception when duplicate_object then null; end $$;
 
 -- 3. GEOGRAPHY & MASTER TABLES
 
--- 3.1 Countries
-create table if not exists public.countries (
-  code text primary key, -- ISO 3166-1 alpha-2 ('IN', 'SE')
-  name text not null,
-  phone_prefix text not null,
-  emergency_number text not null,
-  is_active boolean not null default true
-);
-
--- 3.2 States / Regions
-create table if not exists public.states (
-  id uuid primary key default gen_random_uuid(),
-  country_code text not null references public.countries(code) on delete cascade,
-  name text not null,
-  type text not null check (type in ('state', 'union_territory', 'region')),
-  is_active boolean not null default true,
-  unique (country_code, name)
-);
-
--- 3.3 Cities
+-- 3.1 Cities (with State column)
 create table if not exists public.cities (
   id uuid primary key default gen_random_uuid(),
-  country_code text not null references public.countries(code) on delete cascade,
-  state_id uuid not null references public.states(id) on delete cascade,
   name text not null,
+  state text not null default 'Maharashtra',
   timezone text not null default 'Asia/Kolkata',
   center_lat double precision not null,
   center_lng double precision not null,
-  radius_km double precision not null check (radius_km > 0) default 20,
+  radius_km double precision not null check (radius_km > 0) default 25,
   is_active boolean not null default true,
-  unique (state_id, name)
+  unique (state, name)
 );
 
-create index if not exists idx_cities_state_active on public.cities (state_id, is_active, name);
+create index if not exists idx_cities_state on public.cities (state, is_active, name);
 
--- 3.4 Categories (Catalog of issue types)
+-- 3.2 Wards / Prabhags (Ward -> City -> State)
+create table if not exists public.wards (
+  id uuid primary key default gen_random_uuid(),
+  city_id uuid not null references public.cities(id) on delete cascade,
+  ward_number integer not null,
+  name text not null,
+  office_address text,
+  is_active boolean not null default true,
+  unique (city_id, ward_number),
+  unique (city_id, name)
+);
+
+create index if not exists idx_wards_city on public.wards (city_id, is_active);
+
+-- 3.3 Categories (Catalog of issue types)
 create table if not exists public.categories (
   code text primary key,
   label text not null,
@@ -92,7 +86,7 @@ create table if not exists public.categories (
   is_active boolean not null default true
 );
 
--- 3.5 Departments
+-- 3.4 Departments
 create table if not exists public.departments (
   id uuid primary key default gen_random_uuid(),
   city_id uuid not null references public.cities(id) on delete cascade,
@@ -105,14 +99,6 @@ create table if not exists public.departments (
   unique (city_id, name)
 );
 
--- 3.6 Department Routing Overrides (Optional per city)
-create table if not exists public.department_routes (
-  city_id uuid not null references public.cities(id) on delete cascade,
-  category_code text not null references public.categories(code) on delete cascade,
-  department_id uuid not null references public.departments(id) on delete cascade,
-  primary key (city_id, category_code)
-);
-
 -- 4. PROFILES (Linked to Supabase auth.users)
 create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
@@ -120,12 +106,14 @@ create table if not exists public.profiles (
   role user_role not null default 'citizen',
   department_id uuid references public.departments(id) on delete set null,
   city_id uuid references public.cities(id) on delete set null,
+  ward_id uuid references public.wards(id) on delete set null,
   phone text,
   created_at timestamptz not null default now()
 );
 
 create index if not exists idx_profiles_role on public.profiles (role);
 create index if not exists idx_profiles_department on public.profiles (department_id);
+create index if not exists idx_profiles_ward on public.profiles (ward_id);
 
 -- 5. COMPLAINTS
 create table if not exists public.complaints (
@@ -133,6 +121,7 @@ create table if not exists public.complaints (
   reference text not null unique,
   citizen_id uuid not null references public.profiles(id) on delete cascade,
   city_id uuid not null references public.cities(id),
+  ward_id uuid references public.wards(id) on delete set null,
   city_source text not null check (city_source in ('gps', 'profile')),
   outside_city_limits boolean not null default false,
   title text not null check (char_length(title) between 1 and 140),
@@ -160,8 +149,8 @@ create table if not exists public.complaints (
 
 create index if not exists idx_complaints_citizen on public.complaints (citizen_id, created_at desc);
 create index if not exists idx_complaints_dept_status on public.complaints (assigned_department_id, status);
-create index if not exists idx_complaints_status on public.complaints (status);
 create index if not exists idx_complaints_city_status on public.complaints (city_id, status);
+create index if not exists idx_complaints_ward on public.complaints (ward_id);
 create index if not exists idx_complaints_category on public.complaints (category);
 
 -- 6. STATUS HISTORY & AUDIT
@@ -216,28 +205,33 @@ create table if not exists public.audit_logs (
 create index if not exists idx_audit_entity on public.audit_logs (entity_type, entity_id, created_at desc);
 create index if not exists idx_audit_actor on public.audit_logs (actor_id, created_at desc);
 
--- 10. SLA POLICIES & COUNTER
-create table if not exists public.sla_policies (
-  severity complaint_severity primary key,
-  target_hours integer not null check (target_hours > 0)
-);
-
+-- 10. REFERENCE COUNTERS (Ticket ID generator)
 create table if not exists public.reference_counters (
   year integer primary key,
   last_seq bigint not null default 0
 );
 
--- 11. VIEWS (With SLA calculations)
-create or replace view public.complaints_with_sla as
+-- 11. VIEWS (With SLA calculation, calculated directly with caller RLS enforcement)
+create or replace view public.complaints_with_sla
+with (security_invoker = true) as
 select
   c.*,
-  c.created_at + make_interval(hours => s.target_hours) as due_at,
+  c.created_at + case c.severity
+    when 'critical' then interval '24 hours'
+    when 'high' then interval '72 hours'
+    when 'medium' then interval '168 hours'
+    else interval '336 hours'
+  end as due_at,
   (
     c.status not in ('resolved', 'closed', 'rejected')
-    and now() > c.created_at + make_interval(hours => s.target_hours)
+    and now() > (c.created_at + case c.severity
+      when 'critical' then interval '24 hours'
+      when 'high' then interval '72 hours'
+      when 'medium' then interval '168 hours'
+      else interval '336 hours'
+    end)
   ) as is_overdue
-from public.complaints c
-join public.sla_policies s on s.severity = c.severity;
+from public.complaints c;
 
 -- 12. HELPER FUNCTIONS & TRIGGERS
 
@@ -263,12 +257,13 @@ create or replace function public.handle_new_user()
 returns trigger
 language plpgsql security definer set search_path = public as $$
 begin
-  insert into public.profiles (id, full_name, role, city_id, phone)
+  insert into public.profiles (id, full_name, role, city_id, ward_id, phone)
   values (
     new.id,
     coalesce(new.raw_user_meta_data->>'full_name', 'Citizen User'),
-    'citizen', -- Always citizen by default
+    'citizen',
     (new.raw_user_meta_data->>'city_id')::uuid,
+    (new.raw_user_meta_data->>'ward_id')::uuid,
     new.raw_user_meta_data->>'phone'
   );
   return new;
@@ -297,28 +292,23 @@ create trigger on_complaint_updated
 
 -- 13. ROW LEVEL SECURITY (RLS) POLICIES
 
-alter table public.countries enable row level security;
-alter table public.states enable row level security;
 alter table public.cities enable row level security;
+alter table public.wards enable row level security;
 alter table public.categories enable row level security;
 alter table public.departments enable row level security;
-alter table public.department_routes enable row level security;
 alter table public.profiles enable row level security;
 alter table public.complaints enable row level security;
 alter table public.complaint_status_history enable row level security;
 alter table public.complaint_comments enable row level security;
 alter table public.notifications enable row level security;
 alter table public.audit_logs enable row level security;
-alter table public.sla_policies enable row level security;
+alter table public.reference_counters enable row level security;
 
 -- Public master tables read access
-create policy "Public read countries" on public.countries for select using (true);
-create policy "Public read states" on public.states for select using (true);
 create policy "Public read cities" on public.cities for select using (true);
+create policy "Public read wards" on public.wards for select using (true);
 create policy "Public read categories" on public.categories for select using (true);
 create policy "Public read departments" on public.departments for select using (true);
-create policy "Public read routes" on public.department_routes for select using (true);
-create policy "Public read sla" on public.sla_policies for select using (true);
 
 -- Profiles RLS
 create policy "Users can view own profile" on public.profiles
@@ -409,21 +399,7 @@ create policy "Admins can view audit logs" on public.audit_logs
 
 -- 14. SEED DATA
 
--- SLA Policies
-insert into public.sla_policies (severity, target_hours) values
-  ('critical', 24),
-  ('high', 72),
-  ('medium', 168),
-  ('low', 336)
-on conflict (severity) do update set target_hours = excluded.target_hours;
-
--- Countries
-insert into public.countries (code, name, phone_prefix, emergency_number, is_active) values
-  ('IN', 'India', '+91', '112', true),
-  ('SE', 'Sweden', '+46', '112', true)
-on conflict (code) do nothing;
-
--- Categories (21 PRD standard categories)
+-- Categories (21 PRD standard municipal categories)
 insert into public.categories (code, label, group_code, group_label, examples, department_key, severity_hint, sort_order) values
   ('road_damage', 'Potholes & road damage', 'roads_traffic', 'Roads & Traffic', 'Potholes, broken or sunken road', 'roads', 'medium', 1),
   ('traffic_signal', 'Traffic signals & signs', 'roads_traffic', 'Roads & Traffic', 'Signal not working, missing sign, faded zebra crossing', 'traffic', 'high', 2),
@@ -447,4 +423,3 @@ insert into public.categories (code, label, group_code, group_label, examples, d
   ('park_maintenance', 'Park / playground damage', 'parks_trees', 'Parks & Trees', 'Broken bench or swing, unmaintained park', 'garden', 'low', 20),
   ('other', 'Other / not sure', 'other', 'Other', 'Anything else', 'general', 'medium', 21)
 on conflict (code) do nothing;
-
