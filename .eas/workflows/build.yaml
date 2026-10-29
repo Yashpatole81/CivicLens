@@ -1,0 +1,16 @@
+name: Build Android APK
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  workflow_dispatch: {}
+
+jobs:
+  build_android:
+    name: Build Android Preview APK
+    type: build
+    params:
+      platform: android
+      profile: preview
