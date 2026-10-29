@@ -15,7 +15,7 @@ export default function SlaPolicies() {
   return (
     <AdminPage title="SLA policies" subtitle="Target resolution time by severity, counted from submission">
       <Notice icon="information-circle-outline">
-        Read-only for now. Editing will update the sla_policies table once the backend is connected. Changing a complaint’s severity
+        Read-only for now. Editing will update the sla_policies table once the backend is connected. {"Changing a complaint's severity"}
         recalculates its due time from the original submission time.
       </Notice>
       <Panel>

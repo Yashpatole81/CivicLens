@@ -46,7 +46,7 @@ export default function Verify() {
         <Card style={styles.note}>
           <Icon name="shield-checkmark-outline" size={20} color={colors.green7} />
           <T variant="small" style={{ flex: 1, color: colors.ink2 }}>
-            You can’t log in until your email is verified. This only happens once.
+            {"You can't log in until your email is verified. This only happens once."}
           </T>
         </Card>
       </View>

@@ -18,9 +18,11 @@ export type SignUpPayload = {
   email: string;
   password: string;
   fullName: string;
+  city?: string;
   cityId: string;
+  ward?: string | null;
   wardId?: string | null;
-  phone?: string;
+  phone?: string | null;
 };
 
 export const AuthService = {
@@ -33,7 +35,9 @@ export const AuthService = {
         options: {
           data: {
             full_name: payload.fullName.trim(),
+            city: payload.city || null,
             city_id: payload.cityId,
+            ward: payload.ward || null,
             ward_id: payload.wardId || null,
             phone: payload.phone?.trim() || null,
           },

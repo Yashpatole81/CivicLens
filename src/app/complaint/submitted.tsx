@@ -87,7 +87,7 @@ export default function Submitted() {
       <Card style={styles.note}>
         <Icon name="notifications-outline" size={18} color={colors.green7} />
         <T variant="small" style={{ flex: 1, color: colors.ink2 }}>
-          We’ll notify you here whenever the status changes.
+          {"We'll notify you here whenever the status changes."}
         </T>
       </Card>
     </Screen>

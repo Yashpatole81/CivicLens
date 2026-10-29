@@ -32,7 +32,7 @@ export default function Categories() {
                 </View>
               </View>
               <Text style={[a.mono, { width: 240 }]}>{c.department}</Text>
-              <View style={{ width: 110 }}>{c.severityHint ? <SeverityTag severity={c.severityHint} /> : <T variant="small">—</T>}</View>
+              <View style={{ width: 110 }}>{c.severityHint ? <SeverityTag severity={c.severityHint} /> : <T variant="small"> - </T>}</View>
               <Text style={[a.mono, { width: 90, textAlign: 'right' }]}>{list.filter((x) => x.category === c.code).length}</Text>
             </View>
           ))}

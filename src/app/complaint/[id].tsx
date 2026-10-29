@@ -37,7 +37,7 @@ export default function ComplaintDetails() {
     return (
       <Screen footer={<Button label="Back" onPress={() => router.back()} />}>
         <TopBar />
-        <T variant="heading">This complaint isn’t available.</T>
+        <T variant="heading">{"This complaint isn't available."}</T>
       </Screen>
     );
   }
@@ -114,7 +114,7 @@ export default function ComplaintDetails() {
       <View style={styles.chips}>
         <StatusChip status={c.status} />
         <Chip
-          label={`${c.department} Â· ${c.city}`}
+          label={`${c.department} · ${c.city}`}
           fg={colors.ink2}
           bg={colors.paper}
         />
@@ -138,7 +138,7 @@ export default function ComplaintDetails() {
             <Text style={styles.noteText}>{c.resolutionNote}</Text>
             <Text style={styles.noteCite}>
               {c.department}
-              {c.resolvedAt ? ` Â· ${formatDateTime(c.resolvedAt)}` : ""}
+              {c.resolvedAt ? ` · ${formatDateTime(c.resolvedAt)}` : ""}
             </Text>
           </View>
           {c.resolvedAt ? (
@@ -151,7 +151,7 @@ export default function ComplaintDetails() {
               <Text
                 style={[styles.withinText, !withinSla && { color: colors.red }]}
               >
-                Resolved in {formatDuration(c.createdAt, c.resolvedAt)} Â·{" "}
+                Resolved in {formatDuration(c.createdAt, c.resolvedAt)} ·{" "}
                 {withinSla ? "within" : "past"} the {SLA_LABEL[c.severity]}{" "}
                 target
               </Text>
@@ -167,7 +167,7 @@ export default function ComplaintDetails() {
         ) : (
           <Meta
             k="Target by"
-            v={`${formatDateTime(due)}${overdue ? " Â· late" : isOpen(c.status) ? " Â· on track" : ""}`}
+            v={`${formatDateTime(due)}${overdue ? " · late" : isOpen(c.status) ? " · on track" : ""}`}
             danger={overdue}
           />
         )}
@@ -187,7 +187,7 @@ export default function ComplaintDetails() {
       <View style={styles.infoRow}>
         <Icon name="pricetag-outline" size={16} color={colors.green7} />
         <Text style={[styles.infoValue, { flex: 1 }]}>
-          {category.label} Â· {SEVERITY_LABEL[c.severity]}
+          {category.label} · {SEVERITY_LABEL[c.severity]}
         </Text>
       </View>
       {c.description ? (

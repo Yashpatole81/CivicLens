@@ -177,7 +177,7 @@ export function NoAccess() {
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: space.xl }}>
       <Icon name="lock-closed-outline" size={36} color={colors.ink3} />
       <T variant="heading" style={{ marginTop: space.sm }}>Admins only</T>
-      <T variant="small" style={{ textAlign: 'center', marginTop: 4 }}>Your officer account can’t open this page.</T>
+      <T variant="small" style={{ textAlign: 'center', marginTop: 4 }}>{"Your officer account can't open this page."}</T>
     </View>
   );
 }
