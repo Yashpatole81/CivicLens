@@ -8,9 +8,12 @@
     "scheme": "civiclens",
     "userInterfaceStyle": "light",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/expo.icon",
+      "bundleIdentifier": "com.civiclens.app",
+      "supportsTablet": false
     },
     "android": {
+      "package": "com.civiclens.app",
       "adaptiveIcon": {
         "backgroundColor": "#0C3A2B",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
