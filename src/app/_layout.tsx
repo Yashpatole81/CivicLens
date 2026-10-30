@@ -14,7 +14,7 @@ import { useEffect } from 'react';
 
 import { AppProvider } from '@/store/app-store';
 
-SplashScreen.preventAutoHideAsync();
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
@@ -29,7 +29,9 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
-    if (loaded || error) SplashScreen.hideAsync();
+    if (loaded || error) {
+      SplashScreen.hideAsync().catch(() => {});
+    }
   }, [loaded, error]);
 
   // If fonts fail to load we still render with system fonts rather than block the app.
