@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import { useState, type ReactNode } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import {
   ActivityIndicator,
   StyleSheet,
@@ -36,10 +36,10 @@ export default function Describe() {
   const fromAi =
     suggestion?.source === "model" && suggestion.category === draft.category;
 
-  const analyze = async () => {
+  const analyze = useCallback(async () => {
     setAnalyzing(true);
     try {
-      const s = await suggestIssue(draft.description);
+      const s = await suggestIssue(draft.description, draft.photoUri);
       updateDraft(
         s.source === "model"
           ? {
@@ -53,7 +53,28 @@ export default function Describe() {
     } finally {
       setAnalyzing(false);
     }
-  };
+  }, [
+    draft.description,
+    draft.photoUri,
+    draft.titleEdited,
+    draft.title,
+    updateDraft,
+  ]);
+
+  useEffect(() => {
+    let active = true;
+    if (draft.photoUri && !draft.category && !draft.suggestion) {
+      const timer = setTimeout(() => {
+        if (active) {
+          analyze();
+        }
+      }, 150);
+      return () => {
+        active = false;
+        clearTimeout(timer);
+      };
+    }
+  }, [draft.photoUri, draft.category, draft.suggestion, analyze]);
 
   return (
     <Screen
@@ -122,7 +143,7 @@ export default function Describe() {
           {analyzing ? (
             <View style={styles.row}>
               <ActivityIndicator color={colors.green7} />
-              <T variant="small">Analysing your report...</T>
+              <T variant="small">Meta Muse Spark AI analysing photo...</T>
             </View>
           ) : category ? (
             <>
@@ -139,7 +160,34 @@ export default function Describe() {
                 label="Severity"
                 node={<SeverityTag severity={draft.severity} />}
               />
-              <Kv label="Goes to" value={category.department} last />
+              <Kv
+                label="Goes to"
+                value={category.department}
+                last={!suggestion?.observations?.length}
+              />
+              {suggestion?.observations && suggestion.observations.length > 0 ? (
+                <View style={{ marginTop: space.xs, paddingTop: space.xs }}>
+                  <T
+                    variant="caption"
+                    style={{ color: colors.ink3, marginBottom: 2 }}
+                  >
+                    AI Observations:
+                  </T>
+                  {suggestion.observations.map((obs, idx) => (
+                    <T
+                      key={idx}
+                      variant="small"
+                      style={{
+                        fontSize: 11,
+                        color: colors.ink2,
+                        lineHeight: 15,
+                      }}
+                    >
+                      • {obs}
+                    </T>
+                  ))}
+                </View>
+              ) : null}
             </>
           ) : suggestion?.source === "fallback" ? (
             <Notice tone="warn" icon="information-circle-outline">
@@ -174,8 +222,8 @@ export default function Describe() {
       </View>
 
       <T variant="mono" style={{ fontSize: 10, marginTop: space.sm }}>
-        DEMO AI: MATCHES KEYWORDS IN YOUR DESCRIPTION. REAL IMAGE ANALYSIS COMES
-        WITH THE BACKEND.
+        POWERED BY META MUSE SPARK OPEN (BASETEN) · MULTIMODAL VISION REASONING
+
       </T>
     </Screen>
   );
