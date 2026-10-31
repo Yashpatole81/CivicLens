@@ -39,7 +39,7 @@ export default function Describe() {
   const analyze = useCallback(async () => {
     setAnalyzing(true);
     try {
-      const s = await suggestIssue(draft.description, draft.photoUri);
+      const s = await suggestIssue(draft.description, draft.photoUri, draft.photoBase64);
       updateDraft(
         s.source === "model"
           ? {
@@ -56,6 +56,7 @@ export default function Describe() {
   }, [
     draft.description,
     draft.photoUri,
+    draft.photoBase64,
     draft.titleEdited,
     draft.title,
     updateDraft,
@@ -223,7 +224,6 @@ export default function Describe() {
 
       <T variant="mono" style={{ fontSize: 10, marginTop: space.sm }}>
         POWERED BY META MUSE SPARK OPEN (BASETEN) · MULTIMODAL VISION REASONING
-
       </T>
     </Screen>
   );

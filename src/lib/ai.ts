@@ -48,127 +48,127 @@ const RULES: {
   severity: Severity;
   title: string;
 }[] = [
-  {
-    category: "open_manhole",
-    words: ["manhole", "gutter cover", "chamber"],
-    severity: "critical",
-    title: "Open manhole",
-  },
-  {
-    category: "electrical_hazard",
-    words: ["wire", "spark", "shock", "transformer box", "pole"],
-    severity: "critical",
-    title: "Electrical hazard",
-  },
-  {
-    category: "road_damage",
-    words: ["pothole", "road damage", "crack", "broken road", "gaddha"],
-    severity: "high",
-    title: "Pothole on road",
-  },
-  {
-    category: "traffic_signal",
-    words: ["signal", "traffic light", "zebra", "sign board"],
-    severity: "high",
-    title: "Traffic signal issue",
-  },
-  {
-    category: "footpath",
-    words: ["footpath", "sidewalk", "pavement", "ramp"],
-    severity: "medium",
-    title: "Damaged footpath",
-  },
-  {
-    category: "encroachment",
-    words: ["encroach", "stall", "hawker", "illegal shop"],
-    severity: "medium",
-    title: "Encroachment",
-  },
-  {
-    category: "drainage",
-    words: ["drain", "sewage", "sewer", "nala", "nullah"],
-    severity: "high",
-    title: "Blocked drain",
-  },
-  {
-    category: "waterlogging",
-    words: ["waterlog", "flood", "standing water", "water on road"],
-    severity: "high",
-    title: "Waterlogging on road",
-  },
-  {
-    category: "water_leakage",
-    words: ["leak", "pipe", "burst", "valve"],
-    severity: "medium",
-    title: "Water pipe leakage",
-  },
-  {
-    category: "water_supply",
-    words: ["no water", "dirty water", "water supply", "contaminated"],
-    severity: "high",
-    title: "Water supply problem",
-  },
-  {
-    category: "streetlight",
-    words: ["streetlight", "street light", "lamp", "dark street"],
-    severity: "medium",
-    title: "Streetlight not working",
-  },
-  {
-    category: "power_supply",
-    words: ["power cut", "electricity", "no power", "outage"],
-    severity: "medium",
-    title: "Power supply issue",
-  },
-  {
-    category: "garbage",
-    words: ["garbage", "trash", "bin", "kachra", "waste"],
-    severity: "medium",
-    title: "Uncollected garbage",
-  },
-  {
-    category: "illegal_dumping",
-    words: ["debris", "dumping", "dumped", "rubble"],
-    severity: "medium",
-    title: "Illegal dumping",
-  },
-  {
-    category: "public_toilet",
-    words: ["toilet", "urinal", "washroom"],
-    severity: "medium",
-    title: "Public toilet issue",
-  },
-  {
-    category: "mosquito_breeding",
-    words: ["mosquito", "stagnant", "dengue"],
-    severity: "medium",
-    title: "Mosquito breeding site",
-  },
-  {
-    category: "dead_animal",
-    words: ["dead", "carcass"],
-    severity: "high",
-    title: "Dead animal",
-  },
-  {
-    category: "stray_animals",
-    words: ["stray", "dog", "cattle", "cow", "monkey"],
-    severity: "medium",
-    title: "Stray animals",
-  },
-  {
-    category: "fallen_tree",
-    words: ["tree", "branch"],
-    severity: "high",
-    title: "Fallen tree",
-  },
-  {
-    category: "park_maintenance",
-    words: ["park", "swing", "bench", "playground"],
-    severity: "low",
-    title: "Park needs repair",
-  },
-];
+    {
+      category: "open_manhole",
+      words: ["manhole", "gutter cover", "chamber"],
+      severity: "critical",
+      title: "Open manhole",
+    },
+    {
+      category: "electrical_hazard",
+      words: ["wire", "spark", "shock", "transformer box", "pole"],
+      severity: "critical",
+      title: "Electrical hazard",
+    },
+    {
+      category: "road_damage",
+      words: ["pothole", "road damage", "crack", "broken road", "gaddha"],
+      severity: "high",
+      title: "Pothole on road",
+    },
+    {
+      category: "traffic_signal",
+      words: ["signal", "traffic light", "zebra", "sign board"],
+      severity: "high",
+      title: "Traffic signal issue",
+    },
+    {
+      category: "footpath",
+      words: ["footpath", "sidewalk", "pavement", "ramp"],
+      severity: "medium",
+      title: "Damaged footpath",
+    },
+    {
+      category: "encroachment",
+      words: ["encroach", "stall", "hawker", "illegal shop"],
+      severity: "medium",
+      title: "Encroachment",
+    },
+    {
+      category: "drainage",
+      words: ["drain", "sewage", "sewer", "nala", "nullah"],
+      severity: "high",
+      title: "Blocked drain",
+    },
+    {
+      category: "waterlogging",
+      words: ["waterlog", "flood", "standing water", "water on road"],
+      severity: "high",
+      title: "Waterlogging on road",
+    },
+    {
+      category: "water_leakage",
+      words: ["leak", "pipe", "burst", "valve"],
+      severity: "medium",
+      title: "Water pipe leakage",
+    },
+    {
+      category: "water_supply",
+      words: ["no water", "dirty water", "water supply", "contaminated"],
+      severity: "high",
+      title: "Water supply problem",
+    },
+    {
+      category: "streetlight",
+      words: ["streetlight", "street light", "lamp", "dark street"],
+      severity: "medium",
+      title: "Streetlight not working",
+    },
+    {
+      category: "power_supply",
+      words: ["power cut", "electricity", "no power", "outage"],
+      severity: "medium",
+      title: "Power supply issue",
+    },
+    {
+      category: "garbage",
+      words: ["garbage", "trash", "bin", "kachra", "waste"],
+      severity: "medium",
+      title: "Uncollected garbage",
+    },
+    {
+      category: "illegal_dumping",
+      words: ["debris", "dumping", "dumped", "rubble"],
+      severity: "medium",
+      title: "Illegal dumping",
+    },
+    {
+      category: "public_toilet",
+      words: ["toilet", "urinal", "washroom"],
+      severity: "medium",
+      title: "Public toilet issue",
+    },
+    {
+      category: "mosquito_breeding",
+      words: ["mosquito", "stagnant", "dengue"],
+      severity: "medium",
+      title: "Mosquito breeding site",
+    },
+    {
+      category: "dead_animal",
+      words: ["dead", "carcass"],
+      severity: "high",
+      title: "Dead animal",
+    },
+    {
+      category: "stray_animals",
+      words: ["stray", "dog", "cattle", "cow", "monkey"],
+      severity: "medium",
+      title: "Stray animals",
+    },
+    {
+      category: "fallen_tree",
+      words: ["tree", "branch"],
+      severity: "high",
+      title: "Fallen tree",
+    },
+    {
+      category: "park_maintenance",
+      words: ["park", "swing", "bench", "playground"],
+      severity: "low",
+      title: "Park needs repair",
+    },
+  ];
 
 export const FALLBACK: AiSuggestion = {
   source: "fallback",
@@ -239,7 +239,7 @@ function normalizeSeverity(rawSeverity: string | undefined): Severity {
   return "medium";
 }
 
-/** Convert a local image URI to base64 */
+/** Convert a local image URI to base64 fallback */
 async function uriToBase64(uri: string): Promise<string | null> {
   try {
     const res = await fetch(uri);
@@ -255,7 +255,7 @@ async function uriToBase64(uri: string): Promise<string | null> {
       reader.readAsDataURL(blob);
     });
   } catch (err) {
-    console.warn("[CivicLens AI] Failed to convert image to base64:", err);
+    console.warn("[CivicLens AI] uriToBase64 fallback failed:", err);
     return null;
   }
 }
@@ -285,24 +285,44 @@ function localRuleFallback(description: string): AiSuggestion {
 export async function suggestIssue(
   description: string = "",
   photoUri?: string | null,
+  photoBase64?: string | null,
 ): Promise<AiSuggestion> {
   try {
     const userPrompt =
       description.trim() ||
       "Analyze this photo of a municipal civic issue and classify it.";
 
-    let base64Image: string | null = null;
-    if (photoUri) {
-      base64Image = await uriToBase64(photoUri);
-    }
-
     const contentArray: any[] = [{ type: "text", text: userPrompt }];
-    if (base64Image) {
+    let hasImage = false;
+
+    if (photoBase64) {
       contentArray.push({
         type: "image_url",
-        image_url: { url: `data:image/jpeg;base64,${base64Image}` },
+        image_url: { url: `data:image/jpeg;base64,${photoBase64}` },
       });
+      hasImage = true;
+    } else if (photoUri) {
+      if (photoUri.startsWith("http://") || photoUri.startsWith("https://")) {
+        contentArray.push({
+          type: "image_url",
+          image_url: { url: photoUri },
+        });
+        hasImage = true;
+      } else {
+        const b64 = await uriToBase64(photoUri);
+        if (b64) {
+          contentArray.push({
+            type: "image_url",
+            image_url: { url: `data:image/jpeg;base64,${b64}` },
+          });
+          hasImage = true;
+        }
+      }
     }
+
+    console.log(
+      `[CivicLens AI] Invoking Muse Spark Open: imageAttached=${hasImage}, prompt="${userPrompt.slice(0, 50)}..."`,
+    );
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s timeout
@@ -320,7 +340,7 @@ export async function suggestIssue(
           { role: "system", content: SYSTEM_PROMPT },
           {
             role: "user",
-            content: base64Image ? contentArray : userPrompt,
+            content: hasImage ? contentArray : userPrompt,
           },
         ],
       }),
@@ -329,15 +349,22 @@ export async function suggestIssue(
     clearTimeout(timeoutId);
 
     if (!res.ok) {
-      console.warn("[CivicLens AI] Baseten returned non-200:", res.status);
+      const errBody = await res.text().catch(() => "");
+      console.warn(
+        `[CivicLens AI] Baseten returned non-200 (${res.status}):`,
+        errBody,
+      );
       return localRuleFallback(description);
     }
 
     const data = await res.json();
     const rawContent = data.choices?.[0]?.message?.content;
     if (!rawContent) {
+      console.warn("[CivicLens AI] Empty response from model");
       return localRuleFallback(description);
     }
+
+    console.log("[CivicLens AI] Raw output:", rawContent);
 
     // Clean JSON markdown wraps if present
     const cleanedJson = rawContent

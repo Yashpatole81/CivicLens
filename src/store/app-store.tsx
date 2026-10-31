@@ -53,6 +53,7 @@ export type DraftLocation = {
 
 export type Draft = {
   photoUri: string | null;
+  photoBase64?: string | null;
   location: DraftLocation | null;
   description: string;
   suggestion: AiSuggestion | null;
@@ -66,6 +67,7 @@ export type Draft = {
 
 const EMPTY_DRAFT: Draft = {
   photoUri: null,
+  photoBase64: null,
   location: null,
   description: "",
   suggestion: null,
@@ -272,7 +274,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const currentUserId = await AuthService.getCurrentUserId();
       if (currentUserId && draft.photoUri) {
         let photoPath = "placeholder.jpg";
-        const uploadRes = await StorageService.uploadComplaintPhoto(currentUserId, draft.photoUri);
+        const uploadRes = await StorageService.uploadComplaintPhoto(
+          currentUserId,
+          draft.photoUri,
+          draft.photoBase64,
+        );
         if (uploadRes.data?.photoPath) {
           photoPath = uploadRes.data.photoPath;
         }

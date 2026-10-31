@@ -47,9 +47,18 @@ export default function NewComplaint() {
       const perm = await ImagePicker.requestCameraPermissionsAsync();
       if (!perm.granted) return setCam(perm.canAskAgain ? 'denied' : 'blocked');
       setCam('idle');
-      const result = await ImagePicker.launchCameraAsync({ mediaTypes: ['images'], quality: 0.7, exif: false });
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ['images'],
+        quality: 0.6,
+        base64: true,
+        exif: false,
+      });
       if (result.canceled) return;
-      updateDraft({ photoUri: result.assets[0].uri });
+      const asset = result.assets[0];
+      updateDraft({
+        photoUri: asset.uri,
+        photoBase64: asset.base64,
+      });
       setCapturedAt(new Date());
       if (!draft.location) fetchLocation();
     } catch {

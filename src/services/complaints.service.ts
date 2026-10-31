@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import type { Complaint, HistoryEntry, Severity, Status } from "@/types";
 import { failure, success, type ServiceResult } from "./api-client";
+import { StorageService } from "./storage.service";
 
 export type SubmitComplaintPayload = {
   idempotencyKey: string;
@@ -110,6 +111,8 @@ export const ComplaintsService = {
           update: h.citizen_visible_update ?? undefined,
         }));
 
+        const resolvedPhoto = StorageService.getPublicPhotoUrl(row.photo_path);
+
         return {
           id: row.id,
           reference: row.reference,
@@ -126,7 +129,7 @@ export const ComplaintsService = {
           latitude: row.latitude,
           longitude: row.longitude,
           accuracyM: row.location_accuracy_m ?? undefined,
-          photoUri: row.photo_path,
+          photoUri: resolvedPhoto ?? null,
           createdAt: row.created_at,
           resolvedAt: row.resolved_at ?? undefined,
           resolutionNote: row.resolution_notes ?? undefined,
@@ -167,4 +170,3 @@ export const ComplaintsService = {
     };
   },
 };
-
