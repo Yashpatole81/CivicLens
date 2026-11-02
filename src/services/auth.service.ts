@@ -70,6 +70,31 @@ export const AuthService = {
     }
   },
 
+  /** Sign in specifically for municipal staff (validates admin/officer role). */
+  async staffSignIn(email: string, password: string): Promise<ServiceResult<UserProfile>> {
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim().toLowerCase(),
+        password,
+      });
+
+      if (error) return failure(error.message);
+      if (!data.user) return failure("No user returned from Supabase Auth.");
+
+      const profileRes = await this.getProfile(data.user.id);
+      if (!profileRes.data) return failure(profileRes.error || "Profile not found.");
+
+      if (profileRes.data.role !== "admin" && profileRes.data.role !== "officer") {
+        await supabase.auth.signOut();
+        return failure("This account does not have municipal staff access.");
+      }
+
+      return success(profileRes.data);
+    } catch (err) {
+      return failure(err, "Staff sign in failed.");
+    }
+  },
+
   /** Sign out and clear cached auth sessions. */
   async signOut(): Promise<ServiceResult<boolean>> {
     try {

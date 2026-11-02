@@ -35,8 +35,8 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const items = NAV.filter((n) => isAdmin(staff) || !ADMIN_ONLY_PATHS.includes(n.path));
   const active = (n: NavItem) => (n.path === '/admin' ? pathname === '/admin' : pathname.startsWith(n.path));
 
-  const signOut = () => {
-    staffSignOut();
+  const signOut = async () => {
+    await staffSignOut();
     router.replace('/admin/login');
   };
 
@@ -121,13 +121,9 @@ export function AdminPage({ title, subtitle, right, children }: { title: string;
           <Text style={styles.h1}>{title}</Text>
           {subtitle ? <T variant="small">{subtitle}</T> : null}
         </View>
-        <Chip label="DEMO DATA" fg={colors.paper} bg={colors.ink} />
         {right}
       </View>
       {children}
-      <T variant="mono" style={{ fontSize: 10.5, marginTop: space.lg }}>
-        FRONTEND DEMO · ACCESS RULES RUN IN THE BROWSER ONLY · REAL ENFORCEMENT COMES FROM SUPABASE RLS
-      </T>
     </ScrollView>
   );
 }

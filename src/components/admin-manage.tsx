@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Linking, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Linking, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { Photo } from '@/components/complaint-bits';
 import { Select } from '@/components/select';
@@ -8,10 +8,11 @@ import { Button, Chip, Icon, Notice, StatusChip, T } from '@/components/ui';
 import { colors, fonts, radius, space } from '@/constants/theme';
 import { CATEGORIES, getCategory } from '@/data/categories';
 import { canManage, canReassign } from '@/lib/access';
+import { suggestIssue } from '@/lib/ai';
 import { SEVERITY_LABEL, STATUS_LABEL } from '@/lib/format';
 import { NEEDS_NOTE, NEXT_STATUS } from '@/lib/workflow';
 import { LIMITS, useApp } from '@/store/app-store';
-import type { Complaint, Severity, Status } from '@/types';
+import type { AiSuggestion, Complaint, Severity, Status } from '@/types';
 
 const SEVERITIES: Severity[] = ['low', 'medium', 'high', 'critical'];
 
@@ -21,6 +22,10 @@ export function ManagePanel({ c, showOpenLink }: { c: Complaint; showOpenLink?: 
   const [publicUpdate, setPublicUpdate] = useState('');
   const [internal, setInternal] = useState(c.internalNote ?? '');
   const [message, setMessage] = useState<{ tone: 'danger' | 'info'; text: string } | null>(null);
+
+  // Meta Muse Spark AI Audit state for Admins/Officers
+  const [aiAuditing, setAiAuditing] = useState(false);
+  const [aiAudit, setAiAudit] = useState<AiSuggestion | null>(null);
 
   const cat = getCategory(c.category);
   const allowed = canManage(staff, c);
@@ -40,6 +45,19 @@ export function ManagePanel({ c, showOpenLink }: { c: Complaint; showOpenLink?: 
     // A public update without a status change is recorded on the current status.
     const r = await updateStatus(c.id, c.status, publicUpdate);
     show(r, 'Update published.');
+  };
+
+  const runAiAudit = async () => {
+    setAiAuditing(true);
+    try {
+      const res = await suggestIssue(c.description || c.title, c.photoUri);
+      setAiAudit(res);
+      show({ ok: true }, 'Meta Muse Spark AI triage audit completed.');
+    } catch {
+      show({ ok: false, error: 'AI audit failed to connect to Baseten.' }, '');
+    } finally {
+      setAiAuditing(false);
+    }
   };
 
   // Mapping (lat/lng are numbers from our own data, so the URL can't be injected into).
@@ -82,6 +100,77 @@ export function ManagePanel({ c, showOpenLink }: { c: Complaint; showOpenLink?: 
           <View style={styles.cmp}>
             <T variant="caption" style={{ fontSize: 9.5 }}>Final · {cat.department}</T>
             <Text style={styles.cmpText}>{cat.label}</Text>
+          </View>
+        </View>
+
+        {/* AI Triage Audit Card */}
+        <View style={styles.aiAuditBox}>
+          <View style={styles.aiAuditHead}>
+            <Icon name="sparkles-outline" size={15} color={colors.green8} />
+            <Text style={styles.aiAuditTitle}>Meta Muse Spark AI Triage Audit</Text>
+            <View style={{ flex: 1 }} />
+            <Chip label="Hackathon Model" fg={colors.green7} bg="#fff" />
+          </View>
+
+          <View style={{ padding: space.sm, gap: space.sm }}>
+            {aiAuditing ? (
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm, paddingVertical: space.sm }}>
+                <ActivityIndicator color={colors.green7} />
+                <T variant="small">Analyzing image & description via Meta Muse Spark Open...</T>
+              </View>
+            ) : aiAudit ? (
+              <View style={{ gap: space.xs }}>
+                {aiAudit.category === c.category ? (
+                  <Notice tone="info" icon="checkmark-circle-outline">
+                    Photo matches category: {getCategory(aiAudit.category).label}
+                  </Notice>
+                ) : (
+                  <Notice tone="warn" icon="alert-circle-outline">
+                    Potential Mismatch: Model detects {getCategory(aiAudit.category).label} ({getCategory(aiAudit.category).department})
+                  </Notice>
+                )}
+
+                {aiAudit.observations?.length ? (
+                  <View style={{ marginTop: 4 }}>
+                    <T variant="caption" style={{ color: colors.ink3 }}>Visual Observations:</T>
+                    {aiAudit.observations.map((obs, idx) => (
+                      <T key={idx} variant="small" style={{ fontSize: 11, color: colors.ink2 }}>• {obs}</T>
+                    ))}
+                  </View>
+                ) : null}
+
+                <View style={{ flexDirection: 'row', gap: space.sm, marginTop: 6 }}>
+                  {aiAudit.category !== c.category && canReassign(staff) ? (
+                    <Button
+                      kind="outline"
+                      label={`Reassign to ${getCategory(aiAudit.category).label}`}
+                      onPress={() => show(updateComplaint(c.id, { category: aiAudit.category }), 'Complaint reassigned by AI audit.')}
+                      style={{ flex: 1, minHeight: 34 }}
+                    />
+                  ) : null}
+                  {aiAudit.severity !== c.severity && allowed ? (
+                    <Button
+                      kind="outline"
+                      label={`Update to ${SEVERITY_LABEL[aiAudit.severity]}`}
+                      onPress={() => show(updateComplaint(c.id, { severity: aiAudit.severity }), `Severity updated to ${SEVERITY_LABEL[aiAudit.severity]}.`)}
+                      style={{ flex: 1, minHeight: 34 }}
+                    />
+                  ) : null}
+                </View>
+              </View>
+            ) : (
+              <T variant="small">Run automated vision and classification audit on this complaint photo.</T>
+            )}
+
+            {!aiAuditing ? (
+              <Button
+                kind="outline"
+                label={aiAudit ? "Re-run AI Audit" : "Run AI Verification"}
+                icon="sparkles-outline"
+                onPress={runAiAudit}
+                style={{ minHeight: 36, marginTop: 4 }}
+              />
+            ) : null}
           </View>
         </View>
 
@@ -194,6 +283,9 @@ const styles = StyleSheet.create({
   link: { fontFamily: fonts.semibold, fontSize: 12, color: colors.green7 },
   cmp: { flex: 1, borderWidth: 1, borderColor: colors.line, borderRadius: radius.sm, padding: 8, gap: 3 },
   cmpText: { fontFamily: fonts.semibold, fontSize: 12, color: colors.ink },
+  aiAuditBox: { borderWidth: 1.5, borderColor: colors.green2, borderRadius: radius.sm, overflow: 'hidden', backgroundColor: '#FAFDFB' },
+  aiAuditHead: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: space.sm, paddingVertical: 8, backgroundColor: colors.green1 },
+  aiAuditTitle: { fontFamily: fonts.semibold, fontSize: 12, color: colors.green8 },
   lbl: { fontFamily: fonts.semibold, fontSize: 12, color: colors.ink2, marginBottom: 6 },
   lblRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 6 },
   lblInline: { fontFamily: fonts.semibold, fontSize: 12, color: colors.ink2 },
