@@ -219,7 +219,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
     unsubscribeAuth = AuthService.onAuthStateChange(async (uid) => {
       if (!uid) {
         setUser(null);
-        setStaff(null);
       }
     });
 
