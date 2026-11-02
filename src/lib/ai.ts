@@ -325,7 +325,7 @@ export async function suggestIssue(
     );
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s timeout
+    const timeoutId = setTimeout(() => controller.abort(), 45000); // 45s resilient timeout for mobile networks
 
     const res = await fetch(BASETEN_ENDPOINT, {
       method: "POST",
@@ -383,14 +383,17 @@ export async function suggestIssue(
       summary: parsed.summary?.trim() || description.trim(),
       severity,
       observations: Array.isArray(parsed.observations)
-        ? parsed.observations.slice(0, 3)
+        ? parsed.observations.slice(0, 4)
         : [],
       confidence:
         typeof parsed.confidence === "number" ? parsed.confidence : 0.9,
       needsClarification: Boolean(parsed.needsClarification),
     };
-  } catch (err) {
-    console.warn("[CivicLens AI] Baseten call failed, using fallback:", err);
+  } catch (err: any) {
+    console.warn(
+      "[CivicLens AI] Baseten call failed, using fallback:",
+      err?.message || err,
+    );
     return localRuleFallback(description);
   }
 }

@@ -132,7 +132,7 @@ export default function Describe() {
             {category && !fromAi ? "Your category" : "AI suggestion"}
           </Text>
           <View style={{ flex: 1 }} />
-          {fromAi ? (
+          {fromAi && draft.category !== "other" ? (
             <Chip label="Please check" fg={colors.amber} bg="#fff" />
           ) : null}
           {category && !fromAi ? (
@@ -146,7 +146,7 @@ export default function Describe() {
               <ActivityIndicator color={colors.green7} />
               <T variant="small">Meta Muse Spark AI analysing photo...</T>
             </View>
-          ) : category ? (
+          ) : category && draft.category !== "other" ? (
             <>
               <View style={styles.catHead}>
                 <GroupIcon group={category.group} size={34} />
@@ -190,10 +190,23 @@ export default function Describe() {
                 </View>
               ) : null}
             </>
+          ) : suggestion?.source === "model" && draft.category === "other" ? (
+            <View style={{ gap: space.xs }}>
+              <Notice tone="info" icon="information-circle-outline">
+                {suggestion.summary || "No civic hazard detected in this photo. Please pick a category manually or retake the photo."}
+              </Notice>
+              {suggestion.observations?.length ? (
+                <View style={{ marginTop: 4 }}>
+                  <T variant="caption" style={{ color: colors.ink3 }}>Observations:</T>
+                  {suggestion.observations.map((obs, idx) => (
+                    <T key={idx} variant="small" style={{ fontSize: 11, color: colors.ink2 }}>• {obs}</T>
+                  ))}
+                </View>
+              ) : null}
+            </View>
           ) : suggestion?.source === "fallback" ? (
             <Notice tone="warn" icon="information-circle-outline">
-              {"We couldn't work out the issue type automatically. Please pick a"}
-              category.
+              {"We couldn't work out the issue type automatically. Please pick a category."}
             </Notice>
           ) : (
             <T variant="small">

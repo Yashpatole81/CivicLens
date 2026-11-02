@@ -49,7 +49,7 @@ export default function NewComplaint() {
       setCam('idle');
       const result = await ImagePicker.launchCameraAsync({
         mediaTypes: ['images'],
-        quality: 0.6,
+        quality: 0.35,
         base64: true,
         exif: false,
       });
