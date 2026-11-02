@@ -1,20 +1,20 @@
 import { router } from "expo-router";
 import { useState } from "react";
 import {
-    Pressable,
-    StyleSheet,
-    Text,
-    useWindowDimensions,
-    View,
+  Pressable,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
 } from "react-native";
 
 import {
-    adminStyles as a,
-    AdminPage,
-    BarRow,
-    Kpi,
-    Panel,
-    useScopedComplaints,
+  adminStyles as a,
+  AdminPage,
+  BarRow,
+  Kpi,
+  Panel,
+  useScopedComplaints,
 } from "@/components/admin";
 import { ManagePanel } from "@/components/admin-manage";
 import { GroupIcon } from "@/components/complaint-bits";
@@ -141,6 +141,9 @@ export default function Dashboard() {
           right="BY CATEGORY"
           style={{ flex: 1, minWidth: 300 }}
         >
+          {byCategory.length === 0 ? (
+            <T variant="small">No complaints reported yet.</T>
+          ) : null}
           {byCategory.map(([code, n]) => {
             const cat = getCategory(code);
             return (

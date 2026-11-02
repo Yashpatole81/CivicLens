@@ -10,9 +10,6 @@ import { getCategory } from "@/data/categories";
 import {
   DEMO_STAFF,
   DEMO_USER,
-  DEMO_USER_COMPLAINT_IDS,
-  MORE_COMPLAINTS,
-  SEED_COMPLAINTS,
   type StaffUser,
 } from "@/data/mock";
 import { canManage, canReassign, isStaff } from "@/lib/access";
@@ -130,20 +127,25 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [registered, setRegistered] = useState<User | null>(null);
   const [pendingEmail, setPendingEmail] = useState<string | null>(null);
   const [staff, setStaff] = useState<StaffUser | null>(null);
-  const [complaints, setComplaints] = useState<Complaint[]>([
-    ...SEED_COMPLAINTS,
-    ...MORE_COMPLAINTS,
-  ]);
-  const [myComplaintIds, setMyComplaintIds] = useState<string[]>(
-    DEMO_USER_COMPLAINT_IDS,
-  );
+  const [complaints, setComplaints] = useState<Complaint[]>([]);
+  const [myComplaintIds, setMyComplaintIds] = useState<string[]>([]);
   const [draft, setDraft] = useState<Draft>(EMPTY_DRAFT);
 
-  // Sync session and complaints on mount
+  // Sync session and live complaints on mount
   useEffect(() => {
     let unsubscribeAuth: (() => void) | undefined;
 
     async function initSession() {
+      // 1. Fetch live complaints from Supabase
+      try {
+        const complaintsRes = await ComplaintsService.getMyComplaints();
+        if (complaintsRes.data) {
+          setComplaints(complaintsRes.data);
+        }
+      } catch (err) {
+        console.warn("[CivicLens Store] Failed to fetch complaints on init:", err);
+      }
+
       const currentUserId = await AuthService.getCurrentUserId();
       if (currentUserId) {
         const profileRes = await AuthService.getProfile(currentUserId);
@@ -161,9 +163,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
           });
         }
 
-        // Fetch real complaints from Supabase
+        // Fetch citizen-specific complaints
         const complaintsRes = await ComplaintsService.getMyComplaints();
-        if (complaintsRes.data && complaintsRes.data.length > 0) {
+        if (complaintsRes.data) {
           setComplaints(complaintsRes.data);
           setMyComplaintIds(complaintsRes.data.map((c) => c.id));
         }
@@ -205,7 +207,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
             role: profile.data.role,
           });
           const complaintsRes = await ComplaintsService.getMyComplaints();
-          if (complaintsRes.data && complaintsRes.data.length > 0) {
+          if (complaintsRes.data) {
             setComplaints(complaintsRes.data);
             setMyComplaintIds(complaintsRes.data.map((c) => c.id));
           }
@@ -256,6 +258,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
       if (!account || !isStaff(account))
         return { ok: false, error: "This account has no staff access." };
       setStaff(account);
+      // Fetch fresh live complaints from Supabase for staff dashboard
+      ComplaintsService.getMyComplaints().then((res) => {
+        if (res.data) setComplaints(res.data);
+      });
       return { ok: true };
     },
     staffSignOut: () => setStaff(null),
