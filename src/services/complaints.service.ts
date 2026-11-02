@@ -1,3 +1,4 @@
+import { getCategory } from "@/data/categories";
 import { supabase } from "@/lib/supabase";
 import type { Complaint, HistoryEntry, Severity, Status } from "@/types";
 import { failure, success, type ServiceResult } from "./api-client";
@@ -53,7 +54,10 @@ export const ComplaintsService = {
         p_outside_city_limits: payload.outsideCityLimits ?? false,
       });
 
-      if (error) return failure(error.message);
+      if (error) {
+        console.warn("[ComplaintsService] submitComplaint RPC error:", error.message);
+        return failure(error.message);
+      }
 
       return success({
         id: data.id,
@@ -62,12 +66,13 @@ export const ComplaintsService = {
         idempotentReplay: Boolean(data.idempotent_replay),
       });
     } catch (err) {
+      console.warn("[ComplaintsService] submitComplaint caught:", err);
       return failure(err, "Failed to submit complaint.");
     }
   },
 
   /**
-   * Fetch all complaints filed by the current user (filtered by citizen_id via RLS).
+   * Fetch all complaints from Supabase.
    */
   async getMyComplaints(): Promise<ServiceResult<Complaint[]>> {
     try {
@@ -102,7 +107,10 @@ export const ComplaintsService = {
         `)
         .order("created_at", { ascending: false });
 
-      if (error) return failure(error.message);
+      if (error) {
+        console.warn("[ComplaintsService] getMyComplaints fetch error:", error.message);
+        return failure(error.message);
+      }
 
       const items: Complaint[] = (data || []).map((row: any) => {
         const historyEntries: HistoryEntry[] = (row.complaint_status_history || []).map((h: any) => ({
@@ -112,6 +120,7 @@ export const ComplaintsService = {
         }));
 
         const resolvedPhoto = StorageService.getPublicPhotoUrl(row.photo_path);
+        const catInfo = getCategory(row.category);
 
         return {
           id: row.id,
@@ -122,8 +131,8 @@ export const ComplaintsService = {
           aiCategory: row.ai_suggested_category ?? undefined,
           severity: row.severity as Severity,
           status: row.status as Status,
-          department: row.departments?.name ?? "Municipal Review",
-          city: row.cities?.name ?? "",
+          department: row.departments?.name || catInfo.department || "Municipal Review",
+          city: row.cities?.name || "Pune",
           address: row.address_text ?? "",
           locality: row.locality ?? undefined,
           latitude: row.latitude,
@@ -139,6 +148,7 @@ export const ComplaintsService = {
 
       return success(items);
     } catch (err) {
+      console.warn("[ComplaintsService] getMyComplaints caught:", err);
       return failure(err, "Failed to load complaints.");
     }
   },

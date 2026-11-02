@@ -10,23 +10,26 @@ import { useApp } from '@/store/app-store';
 
 const MAX_ATTEMPTS = 5;
 
-/** Staff sign-in. Demo only: role comes from the seeded account, never from user input. */
+/** Staff sign-in. */
 export default function StaffLogin() {
   const { staffSignIn } = useApp();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [attempts, setAttempts] = useState(0);
   const locked = attempts >= MAX_ATTEMPTS;
 
-  const onSubmit = () => {
-    if (locked) return;
+  const onSubmit = async () => {
+    if (locked || loading) return;
     if (!email.trim() || !password) return setError('Enter your work email and password.');
-    const res = staffSignIn(email);
+    setLoading(true);
+    setError(null);
+    const res = await staffSignIn(email, password);
+    setLoading(false);
     if (!res.ok) {
       setAttempts((a) => a + 1);
-      // Same message for unknown and non-staff accounts (no account enumeration).
-      return setError('Email or password is incorrect, or this account has no staff access.');
+      return setError(res.error || 'Email or password is incorrect, or this account has no staff access.');
     }
     router.replace('/admin');
   };
@@ -43,8 +46,22 @@ export default function StaffLogin() {
         <T variant="display" style={{ marginTop: space.lg }}>Staff sign in</T>
         <T variant="small" style={{ marginTop: 4 }}>For municipal officers and administrators.</T>
 
-        <Field label="Work email" value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" placeholder="name@example.com" />
-        <Field label="Password" value={password} onChangeText={setPassword} secureTextEntry placeholder="Password" onSubmitEditing={onSubmit} />
+        <Field
+          label="Work email"
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+          keyboardType="email-address"
+          placeholder="name@example.com"
+        />
+        <Field
+          label="Password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          placeholder="Password"
+          onSubmitEditing={onSubmit}
+        />
 
         {error ? <View style={{ marginTop: space.md }}><Notice tone="danger" icon="alert-circle-outline">{error}</Notice></View> : null}
         {locked ? (
@@ -53,12 +70,26 @@ export default function StaffLogin() {
           </View>
         ) : null}
 
-        <Button label="Sign in" onPress={onSubmit} disabled={locked} style={{ marginTop: space.lg }} />
+        <Button
+          label={loading ? "Signing in..." : "Sign in"}
+          onPress={onSubmit}
+          disabled={locked || loading}
+          style={{ marginTop: space.lg }}
+        />
 
         <View style={styles.demo}>
-          <T variant="caption">Demo accounts · any password</T>
+          <T variant="caption">Municipal staff accounts</T>
           {demo.map((s) => (
-            <Pressable key={s.id} accessibilityRole="button" onPress={() => { setEmail(s.email); setPassword('demo'); setError(null); }} style={styles.demoRow}>
+            <Pressable
+              key={s.id}
+              accessibilityRole="button"
+              onPress={() => {
+                setEmail(s.email);
+                setPassword('staff');
+                setError(null);
+              }}
+              style={styles.demoRow}
+            >
               <Text style={styles.demoEmail}>{s.email}</Text>
               <Text style={styles.demoRole}>{s.role === 'admin' ? 'Admin' : s.department}</Text>
             </Pressable>
@@ -70,11 +101,11 @@ export default function StaffLogin() {
 }
 
 const styles = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: colors.green9, alignItems: 'center', justifyContent: 'center', padding: space.lg },
-  card: { width: '100%', maxWidth: 420, backgroundColor: '#fff', borderRadius: radius.lg, padding: space.xl },
+  wrap: { flex: 1, backgroundColor: colors.paper, alignItems: 'center', justifyContent: 'center', padding: space.md },
+  card: { width: '100%', maxWidth: 440, backgroundColor: '#fff', borderRadius: radius.lg, borderWidth: 1, borderColor: colors.line, padding: space.xl },
   brand: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  mark: { width: 36, height: 36, borderRadius: 10, backgroundColor: colors.green5, alignItems: 'center', justifyContent: 'center' },
-  brandText: { fontFamily: fonts.displayBold, fontSize: 22, color: colors.ink },
+  mark: { width: 34, height: 34, borderRadius: 10, backgroundColor: colors.green7, alignItems: 'center', justifyContent: 'center' },
+  brandText: { fontFamily: fonts.displayBold, fontSize: 20, color: colors.ink },
   demo: { marginTop: space.xl, borderTopWidth: 1, borderTopColor: colors.line2, paddingTop: space.md, gap: 4 },
   demoRow: { flexDirection: 'row', justifyContent: 'space-between', gap: space.sm, paddingVertical: 6 },
   demoEmail: { fontFamily: fonts.mono, fontSize: 12, color: colors.green7 },

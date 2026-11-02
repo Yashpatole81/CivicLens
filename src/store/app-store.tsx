@@ -4,6 +4,7 @@
  * Bridges Supabase Cloud Backend (Postgres, Storage, Auth, Realtime)
  * with Offline-First resilient fallback.
  */
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 
 import { getCategory } from "@/data/categories";
@@ -81,6 +82,7 @@ export const LIMITS = { title: 140, description: 2000, note: 2000 } as const;
 type ActionResult = { ok: true } | { ok: false; error: string };
 
 type AppState = {
+  isAuthReady: boolean;
   user: User | null;
   signIn: (email: string, password?: string) => Promise<ActionResult>;
   signOut: () => Promise<void>;
@@ -88,8 +90,8 @@ type AppState = {
   register: (user: User, password?: string) => Promise<ActionResult>;
 
   staff: StaffUser | null;
-  staffSignIn: (email: string) => ActionResult;
-  staffSignOut: () => void;
+  staffSignIn: (email: string, password?: string) => Promise<ActionResult>;
+  staffSignOut: () => Promise<void>;
 
   complaints: Complaint[];
   myComplaintIds: string[];
@@ -117,16 +119,34 @@ function nextReference(list: Complaint[]) {
   return `CL-${year}-${String(max + 1).padStart(6, "0")}`;
 }
 
+const STAFF_STORAGE_KEY = "civiclens_staff_session";
+
+function getInitialStaff(): StaffUser | null {
+  if (typeof window !== "undefined" && window.localStorage) {
+    try {
+      const stored = window.localStorage.getItem(STAFF_STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (isStaff(parsed)) return parsed;
+      }
+    } catch {
+      // ignore
+    }
+  }
+  return null;
+}
+
 const DENIED: ActionResult = {
   ok: false,
   error: "You don't have permission to change this complaint.",
 };
 
 export function AppProvider({ children }: { children: ReactNode }) {
+  const [isAuthReady, setIsAuthReady] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [registered, setRegistered] = useState<User | null>(null);
   const [pendingEmail, setPendingEmail] = useState<string | null>(null);
-  const [staff, setStaff] = useState<StaffUser | null>(null);
+  const [staff, setStaff] = useState<StaffUser | null>(getInitialStaff);
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [myComplaintIds, setMyComplaintIds] = useState<string[]>([]);
   const [draft, setDraft] = useState<Draft>(EMPTY_DRAFT);
@@ -134,6 +154,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
   // Sync session and live complaints on mount
   useEffect(() => {
     let unsubscribeAuth: (() => void) | undefined;
+
+    // Hydrate staff session from AsyncStorage if not already loaded from localStorage
+    AsyncStorage.getItem(STAFF_STORAGE_KEY).then((stored) => {
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (isStaff(parsed)) setStaff((curr) => curr ?? parsed);
+        } catch {}
+      }
+    }).catch(() => {});
 
     async function initSession() {
       // 1. Fetch live complaints from Supabase
@@ -146,29 +176,41 @@ export function AppProvider({ children }: { children: ReactNode }) {
         console.warn("[CivicLens Store] Failed to fetch complaints on init:", err);
       }
 
-      const currentUserId = await AuthService.getCurrentUserId();
-      if (currentUserId) {
-        const profileRes = await AuthService.getProfile(currentUserId);
-        if (profileRes.data) {
-          setUser({
-            id: profileRes.data.id,
-            fullName: profileRes.data.fullName,
-            email: "", // Fetched from auth user
-            country: "IN",
-            state: "IN-MH",
-            city: "Pune",
-            cityId: profileRes.data.cityId ?? "c1111111-1111-1111-1111-111111111101",
-            phone: profileRes.data.phone,
-            role: profileRes.data.role,
-          });
+      try {
+        const currentUserId = await AuthService.getCurrentUserId();
+        if (currentUserId) {
+          const profileRes = await AuthService.getProfile(currentUserId);
+          if (profileRes.data) {
+            if (profileRes.data.role === "admin" || profileRes.data.role === "officer") {
+              const sessionEmail = (await AuthService.getCurrentUserId()) ? (await ComplaintsService.getMyComplaints()).data : null;
+              const matched = DEMO_STAFF.find((s) => s.id === profileRes.data.id || s.name === profileRes.data.fullName);
+              const staffUser: StaffUser = {
+                id: profileRes.data.id,
+                name: profileRes.data.fullName,
+                email: matched?.email || "admin@pune.gov.in",
+                role: profileRes.data.role as "admin" | "officer",
+                department: matched?.department || "Roads & Engineering",
+              };
+              setStaff(staffUser);
+            } else {
+              setUser({
+                id: profileRes.data.id,
+                fullName: profileRes.data.fullName,
+                email: "",
+                country: "IN",
+                state: "IN-MH",
+                city: "Pune",
+                cityId: profileRes.data.cityId ?? "c1111111-1111-1111-1111-111111111101",
+                phone: profileRes.data.phone,
+                role: profileRes.data.role,
+              });
+            }
+          }
         }
-
-        // Fetch citizen-specific complaints
-        const complaintsRes = await ComplaintsService.getMyComplaints();
-        if (complaintsRes.data) {
-          setComplaints(complaintsRes.data);
-          setMyComplaintIds(complaintsRes.data.map((c) => c.id));
-        }
+      } catch (err) {
+        console.warn("[CivicLens Store] Auth init error:", err);
+      } finally {
+        setIsAuthReady(true);
       }
     }
 
@@ -177,6 +219,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     unsubscribeAuth = AuthService.onAuthStateChange(async (uid) => {
       if (!uid) {
         setUser(null);
+        setStaff(null);
       }
     });
 
@@ -250,21 +293,63 @@ export function AppProvider({ children }: { children: ReactNode }) {
       return { ok: true };
     },
 
+    isAuthReady,
     staff,
-    staffSignIn: (email) => {
-      const account = DEMO_STAFF.find(
-        (s) => s.email === email.trim().toLowerCase(),
-      );
+    staffSignIn: async (email: string, password?: string) => {
+      const trimmedEmail = email.trim().toLowerCase();
+      const pass = password || "staff";
+
+      if (process.env.EXPO_PUBLIC_SUPABASE_URL) {
+        const authRes = await AuthService.staffSignIn(trimmedEmail, pass);
+        if (authRes.data) {
+          const matched = DEMO_STAFF.find((s) => s.email === trimmedEmail);
+          const staffUser: StaffUser = {
+            id: authRes.data.id,
+            name: authRes.data.fullName,
+            email: trimmedEmail,
+            role: authRes.data.role as "admin" | "officer",
+            department: matched?.department,
+          };
+          setStaff(staffUser);
+          if (typeof window !== "undefined" && window.localStorage) {
+            try {
+              window.localStorage.setItem(STAFF_STORAGE_KEY, JSON.stringify(staffUser));
+            } catch {}
+          }
+          AsyncStorage.setItem(STAFF_STORAGE_KEY, JSON.stringify(staffUser)).catch(() => {});
+          ComplaintsService.getMyComplaints().then((cRes) => {
+            if (cRes.data) setComplaints(cRes.data);
+          });
+          return { ok: true };
+        }
+      }
+
+      // Fallback to local demo staff
+      const account = DEMO_STAFF.find((s) => s.email === trimmedEmail);
       if (!account || !isStaff(account))
         return { ok: false, error: "This account has no staff access." };
       setStaff(account);
-      // Fetch fresh live complaints from Supabase for staff dashboard
+      if (typeof window !== "undefined" && window.localStorage) {
+        try {
+          window.localStorage.setItem(STAFF_STORAGE_KEY, JSON.stringify(account));
+        } catch {}
+      }
+      AsyncStorage.setItem(STAFF_STORAGE_KEY, JSON.stringify(account)).catch(() => {});
       ComplaintsService.getMyComplaints().then((res) => {
         if (res.data) setComplaints(res.data);
       });
       return { ok: true };
     },
-    staffSignOut: () => setStaff(null),
+    staffSignOut: async () => {
+      await AuthService.signOut();
+      setStaff(null);
+      if (typeof window !== "undefined" && window.localStorage) {
+        try {
+          window.localStorage.removeItem(STAFF_STORAGE_KEY);
+        } catch {}
+      }
+      AsyncStorage.removeItem(STAFF_STORAGE_KEY).catch(() => {});
+    },
 
     complaints,
     myComplaintIds,

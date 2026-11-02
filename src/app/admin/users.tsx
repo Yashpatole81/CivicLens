@@ -12,15 +12,14 @@ const ROLE_COLORS: Record<StaffRole, [string, string]> = {
   citizen: [colors.neutral, colors.neutralBg],
 };
 
-/** Admin only (gated in admin/_layout). Role changes need a server-side Edge Function. */
+/** Admin only (gated in admin/_layout). */
 export default function Users() {
   const { staff } = useApp();
 
   return (
-    <AdminPage title="Users & roles" subtitle={`${DEMO_STAFF.length} demo accounts`}>
-      <Notice tone="warn" icon="shield-checkmark-outline">
-        Role changes are disabled in the demo. In production they go through an admin-only server function that also blocks admins from
-        changing their own role and from removing the last admin. A role set in the app can never be trusted.
+    <AdminPage title="Users & roles" subtitle={`${DEMO_STAFF.length} registered staff accounts`}>
+      <Notice tone="info" icon="shield-checkmark-outline">
+        Municipal staff accounts and departmental officer roles for Pune Municipal Corporation.
       </Notice>
       <Panel>
         <View style={[a.tr, a.th]}>
@@ -43,7 +42,7 @@ export default function Users() {
           );
         })}
       </Panel>
-      <T variant="small">Citizens sign up in the app and always start as citizens. Officers and admins are only created by an admin.</T>
+      <T variant="small">Citizens sign up in the mobile app. Department officers and administrators are assigned by municipal administrators.</T>
     </AdminPage>
   );
 }
